@@ -4,6 +4,7 @@
 #include <QSysInfo>
 
 #include "../util/endianness.h"
+#include "../../lib/Qt-AES/qaesencryption.h"
 
 Script::Script(QString path)
     : m_Script(path)

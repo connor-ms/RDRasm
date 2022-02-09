@@ -9,25 +9,27 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    main.cpp \
-    rage/script.cpp \
-    util/compression.cpp \
-    util/endianness.cpp \
-    util/lzx.c \
-    widgets/disassembler.cpp \
-    widgets/launchscreen.cpp
+    lib/Qt-AES/qaesencryption.cpp \
+    src/main.cpp \
+    src/rage/script.cpp \
+    src/util/compression.cpp \
+    src/util/endianness.cpp \
+    src/util/lzx.c \
+    src/widgets/disassembler.cpp \
+    src/widgets/launchscreen.cpp
 
 HEADERS += \
-    rage/script.h \
-    util/compression.h \
-    util/endianness.h \
-    util/lzx.h \
-    widgets/disassembler.h \
-    widgets/launchscreen.h
+    lib/Qt-AES/qaesencryption.h \
+    src/rage/script.h \
+    src/util/compression.h \
+    src/util/endianness.h \
+    src/util/lzx.h \
+    src/widgets/disassembler.h \
+    src/widgets/launchscreen.h
 
 FORMS += \
-    widgets/disassembler.ui \
-    widgets/launchscreen.ui
+    src/widgets/disassembler.ui \
+    src/widgets/launchscreen.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
