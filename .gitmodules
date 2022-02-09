@@ -1,0 +1,3 @@
+[submodule "lib/Qt-AES"]
+	path = lib/Qt-AES
+	url = https://github.com/bricke/Qt-AES
