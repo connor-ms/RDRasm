@@ -165,7 +165,7 @@ static const ULONG position_base[51] = {
     1835008, 1966080, 2097152
 };
 
-struct LZXstate *LZXinit(int window)
+struct LZXstate *lzxInit(int window)
 {
     struct LZXstate *pState = NULL;
     ULONG wndsize = 1 << window;
@@ -211,7 +211,7 @@ struct LZXstate *LZXinit(int window)
     return pState;
 }
 
-void LZXteardown(struct LZXstate *pState)
+void lzxTeardown(struct LZXstate *pState)
 {
     if (pState)
     {
@@ -221,7 +221,7 @@ void LZXteardown(struct LZXstate *pState)
     }
 }
 
-int LZXreset(struct LZXstate *pState)
+int lzxReset(struct LZXstate *pState)
 {
     int i;
 
@@ -464,7 +464,7 @@ static int lzx_read_lens(struct LZXstate *pState, UBYTE *lens, ULONG first, ULON
     return 0;
 }
 
-int LZXdecompress(struct LZXstate *pState, unsigned char *inpos, unsigned char *outpos, int inlen, int outlen) {
+int lzxDecompress(struct LZXstate *pState, unsigned char *inpos, unsigned char *outpos, int inlen, int outlen) {
     UBYTE *endinp = inpos + inlen;
     UBYTE *window = pState->window;
     UBYTE *runsrc, *rundest;

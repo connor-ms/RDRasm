@@ -16,7 +16,7 @@ public:
     ~Disassembler();
 
 private:
-    Ui::Disassembler *ui;
+    Ui::Disassembler *m_ui;
 };
 
 #endif // DISASSEMBLER_H

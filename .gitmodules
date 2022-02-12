@@ -1,3 +1,6 @@
 [submodule "lib/Qt-AES"]
 	path = lib/Qt-AES
 	url = https://github.com/bricke/Qt-AES
+[submodule "lib/QHexView"]
+	path = lib/QHexView
+	url = https://github.com/Dax89/QHexView

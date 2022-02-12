@@ -21,7 +21,7 @@ private slots:
     void exitPressed();
 
 private:
-    Ui::LaunchScreen *m_Ui;
+    Ui::LaunchScreen *m_ui;
 };
 
 #endif // LAUNCHSCREEN_H

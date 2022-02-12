@@ -1,0 +1,628 @@
+{
+  "opcodes": [
+    {
+      "name": "nop",
+      "size": 1
+    },
+    {
+      "name": "iadd",
+      "size": 1
+    },
+    {
+      "name": "isub",
+      "size": 1
+    },
+    {
+      "name": "imul",
+      "size": 1
+    },
+    {
+      "name": "idiv",
+      "size": 1
+    },
+    {
+      "name": "imod",
+      "size": 1
+    },
+    {
+      "name": "inot",
+      "size": 1
+    },
+    {
+      "name": "ineg",
+      "size": 1
+    },
+    {
+      "name": "icmpeq",
+      "size": 1
+    },
+    {
+      "name": "icmpne",
+      "size": 1
+    },
+    {
+      "name": "icmpgt",
+      "size": 1
+    },
+    {
+      "name": "icmpge",
+      "size": 1
+    },
+    {
+      "name": "icmplt",
+      "size": 1
+    },
+    {
+      "name": "icmple",
+      "size": 1
+    },
+    {
+      "name": "fadd",
+      "size": 1
+    },
+    {
+      "name": "fsub",
+      "size": 1
+    },
+    {
+      "name": "fmul",
+      "size": 1
+    },
+    {
+      "name": "fdiv",
+      "size": 1
+    },
+    {
+      "name": "fmod",
+      "size": 1
+    },
+    {
+      "name": "fneg",
+      "size": 1
+    },
+    {
+      "name": "fcmpeq",
+      "size": 1
+    },
+    {
+      "name": "fcmpne",
+      "size": 1
+    },
+    {
+      "name": "fcmpgt",
+      "size": 1
+    },
+    {
+      "name": "fcmpge",
+      "size": 1
+    },
+    {
+      "name": "fcmplt",
+      "size": 1
+    },
+    {
+      "name": "fcmple",
+      "size": 1
+    },
+    {
+      "name": "vadd",
+      "size": 1
+    },
+    {
+      "name": "vsub",
+      "size": 1
+    },
+    {
+      "name": "vmul",
+      "size": 1
+    },
+    {
+      "name": "vdiv",
+      "size": 1
+    },
+    {
+      "name": "vneg",
+      "size": 1
+    },
+    {
+      "name": "ibitwise_and",
+      "size": 1
+    },
+    {
+      "name": "ibitwise_or",
+      "size": 1
+    },
+    {
+      "name": "ibitwise_xor",
+      "size": 1
+    },
+    {
+      "name": "itof",
+      "size": 1
+    },
+    {
+      "name": "ftoi",
+      "size": 1
+    },
+    {
+      "name": "dup2",
+      "size": 1
+    },
+    {
+      "name": "push1b",
+      "size": 2
+    },
+    {
+      "name": "push2b",
+      "size": 3
+    },
+    {
+      "name": "push13b",
+      "size": 4
+    },
+    {
+      "name": "pushint",
+      "size": 5
+    },
+    {
+      "name": "pushfloat",
+      "size": 5
+    },
+    {
+      "name": "dup",
+      "size": 1
+    },
+    {
+      "name": "drop",
+      "size": 1
+    },
+    {
+      "name": "native",
+      "size": 3
+    },
+    {
+      "name": "enter",
+      "size": 0
+    },
+    {
+      "name": "ret",
+      "size": 3
+    },
+    {
+      "name": "pget",
+      "size": 1
+    },
+    {
+      "name": "pset",
+      "size": 1
+    },
+    {
+      "name": "ppeekset",
+      "size": 1
+    },
+    {
+      "name": "tostack",
+      "size": 1
+    },
+    {
+      "name": "fromstack",
+      "size": 1
+    },
+    {
+      "name": "parray",
+      "size": 2
+    },
+    {
+      "name": "aget",
+      "size": 2
+    },
+    {
+      "name": "aset",
+      "size": 2
+    },
+    {
+      "name": "pframe1",
+      "size": 2
+    },
+    {
+      "name": "getf",
+      "size": 2
+    },
+    {
+      "name": "setf",
+      "size": 2
+    },
+    {
+      "name": "stackgetp",
+      "size": 2
+    },
+    {
+      "name": "stackget",
+      "size": 2
+    },
+    {
+      "name": "stackset",
+      "size": 2
+    },
+    {
+      "name": "iaddimm1",
+      "size": 2
+    },
+    {
+      "name": "pgetimm1",
+      "size": 2
+    },
+    {
+      "name": "psetimm1",
+      "size": 2
+    },
+    {
+      "name": "imulimm1",
+      "size": 2
+    },
+    {
+      "name": "ipush2",
+      "size": 3
+    },
+    {
+      "name": "iaddimm2",
+      "size": 3
+    },
+    {
+      "name": "pgetimm2",
+      "size": 3
+    },
+    {
+      "name": "psetimm2",
+      "size": 3
+    },
+    {
+      "name": "imulimm2",
+      "size": 3
+    },
+    {
+      "name": "arraygetp2",
+      "size": 3
+    },
+    {
+      "name": "arrayget2",
+      "size": 3
+    },
+    {
+      "name": "arrayset2",
+      "size": 3
+    },
+    {
+      "name": "pframe2",
+      "size": 3
+    },
+    {
+      "name": "frameget2",
+      "size": 3
+    },
+    {
+      "name": "frameset2",
+      "size": 3
+    },
+    {
+      "name": "pstatic2",
+      "size": 3
+    },
+    {
+      "name": "staticget2",
+      "size": 3
+    },
+    {
+      "name": "staticset2",
+      "size": 3
+    },
+    {
+      "name": "pglobal2",
+      "size": 3
+    },
+    {
+      "name": "globalget2",
+      "size": 3
+    },
+    {
+      "name": "globalset2",
+      "size": 3
+    },
+    {
+      "name": "call2",
+      "size": 3
+    },
+    {
+      "name": "call2h1",
+      "size": 3
+    },
+    {
+      "name": "call2h2",
+      "size": 3
+    },
+    {
+      "name": "call2h3",
+      "size": 3
+    },
+    {
+      "name": "call2h4",
+      "size": 3
+    },
+    {
+      "name": "call2h5",
+      "size": 3
+    },
+    {
+      "name": "call2h6",
+      "size": 3
+    },
+    {
+      "name": "call2h7",
+      "size": 3
+    },
+    {
+      "name": "call2h8",
+      "size": 3
+    },
+    {
+      "name": "call2h9",
+      "size": 3
+    },
+    {
+      "name": "call2ha",
+      "size": 3
+    },
+    {
+      "name": "call2hb",
+      "size": 3
+    },
+    {
+      "name": "call2hc",
+      "size": 3
+    },
+    {
+      "name": "call2hd",
+      "size": 3
+    },
+    {
+      "name": "call2he",
+      "size": 3
+    },
+    {
+      "name": "call2hf",
+      "size": 3
+    },
+    {
+      "name": "jr2",
+      "size": 3
+    },
+    {
+      "name": "jfr2",
+      "size": 3
+    },
+    {
+      "name": "jner2",
+      "size": 3
+    },
+    {
+      "name": "jeqr2",
+      "size": 3
+    },
+    {
+      "name": "jler2",
+      "size": 3
+    },
+    {
+      "name": "jltr2",
+      "size": 3
+    },
+    {
+      "name": "jger2",
+      "size": 3
+    },
+    {
+      "name": "jgtr2",
+      "size": 3
+    },
+    {
+      "name": "pglobal3",
+      "size": 4
+    },
+    {
+      "name": "globalget3",
+      "size": 4
+    },
+    {
+      "name": "globalset3",
+      "size": 4
+    },
+    {
+      "name": "ipush3",
+      "size": 4
+    },
+    {
+      "name": "switchr2",
+      "size": 0
+    },
+    {
+      "name": "spush",
+      "size": 0
+    },
+    {
+      "name": "spushl",
+      "size": 0
+    },
+    {
+      "name": "spush0",
+      "size": 1
+    },
+    {
+      "name": "scpy",
+      "size": 2
+    },
+    {
+      "name": "itos",
+      "size": 2
+    },
+    {
+      "name": "sadd",
+      "size": 2
+    },
+    {
+      "name": "saddi",
+      "size": 2
+    },
+    {
+      "name": "saddi",
+      "size": 1
+    },
+    {
+      "name": "catch",
+      "size": 1
+    },
+    {
+      "name": "throw",
+      "size": 1
+    },
+    {
+      "name": "pcall",
+      "size": 1
+    },
+    {
+      "name": "ret0r0",
+      "size": 1
+    },
+    {
+      "name": "ret0r1",
+      "size": 1
+    },
+    {
+      "name": "ret0r2",
+      "size": 1
+    },
+    {
+      "name": "ret0r3",
+      "size": 1
+    },
+    {
+      "name": "ret1r0",
+      "size": 1
+    },
+    {
+      "name": "ret1r1",
+      "size": 1
+    },
+    {
+      "name": "ret1r2",
+      "size": 1
+    },
+    {
+      "name": "ret1r3",
+      "size": 1
+    },
+    {
+      "name": "ret2r0",
+      "size": 1
+    },
+    {
+      "name": "ret2r1",
+      "size": 1
+    },
+    {
+      "name": "ret2r2",
+      "size": 1
+    },
+    {
+      "name": "ret2r3",
+      "size": 1
+    },
+    {
+      "name": "ret3r0",
+      "size": 1
+    },
+    {
+      "name": "ret3r1",
+      "size": 1
+    },
+    {
+      "name": "ret3r2",
+      "size": 1
+    },
+    {
+      "name": "ret3r3",
+      "size": 1
+    },
+    {
+      "name": "push -1",
+      "size": 1
+    },
+    {
+      "name": "push 0",
+      "size": 1
+    },
+    {
+      "name": "push 1",
+      "size": 1
+    },
+    {
+      "name": "push 2",
+      "size": 1
+    },
+    {
+      "name": "push 3",
+      "size": 1
+    },
+    {
+      "name": "push 4",
+      "size": 1
+    },
+    {
+      "name": "push 5",
+      "size": 1
+    },
+    {
+      "name": "push 6",
+      "size": 1
+    },
+    {
+      "name": "push 7",
+      "size": 1
+    },
+    {
+      "name": "fimmn1",
+      "size": 1
+    },
+    {
+      "name": "fimm0",
+      "size": 1
+    },
+    {
+      "name": "fimm1",
+      "size": 1
+    },
+    {
+      "name": "fimm2",
+      "size": 1
+    },
+    {
+      "name": "fimm3",
+      "size": 1
+    },
+    {
+      "name": "fimm4",
+      "size": 1
+    },
+    {
+      "name": "fimm5",
+      "size": 1
+    },
+    {
+      "name": "fimm6",
+      "size": 1
+    },
+    {
+      "name": "fimm7",
+      "size": 1
+    }
+  ]
+}

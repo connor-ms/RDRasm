@@ -4,20 +4,41 @@
 #include <QFile>
 #include <QString>
 
-struct ScriptHeader
+#include "opcode.h"
+
+struct ResourceHeader
 {
     int magic;
     int version;
     int flags1;
     int flags2;
 
-    int vsize;
-    int psize;
+    int vSize;
+    int pSze;
     int _f14_30;
     bool extended;
 
-    int GetSizeV() { return extended ? (vsize << 12) : ((int)(flags1 & 0x7FF) << ((int)((flags1 >> 11) & 15) + 8)); }
-    int GetSizeP() { return extended ? (psize << 12) : ((int)((flags1 >> 15) & 0x7FF) << ((int)((flags1 >> 26) & 15) + 8)); }
+    int getSizeV() { return extended ? (vSize << 12) : ((int)(flags1 & 0x7FF) << ((int)((flags1 >> 11) & 15) + 8)); }
+    int getSizeP() { return extended ? (pSze << 12) : ((int)((flags1 >> 15) & 0x7FF) << ((int)((flags1 >> 26) & 15) + 8)); }
+};
+
+struct ScriptHeader
+{
+    int magic;
+    int pageMapPtr;
+    int codeSize;
+    int paramCount;
+
+    int staticsSize;
+    int staticsPtr;
+
+    int globalsVers;
+    int nativesSize;
+    int nativesPtr;
+
+    int codePagesSize;
+    int codePagesPtr;
+    std::vector<int> codePages;
 };
 
 class Script
@@ -25,13 +46,22 @@ class Script
 public:
     Script(QString path);
 
+    QByteArray getData();
+
+    static QList<OpcodeBase> getOpcodes();
+
 private:
-    bool ReadHeader();
+    void readRSCHeader();
+    void extractData();
+    int findScriptHeader();
+    void readScriptHeader(int headerPos);
 
-    ScriptHeader m_Header;
+    ResourceHeader m_header;
+    ScriptHeader m_scriptHeader;
 
-    QFile m_Script;
-    QByteArray m_Data;
+    QByteArray m_data;
+
+    QFile m_script;
 };
 
 #endif // SCRIPT_H
