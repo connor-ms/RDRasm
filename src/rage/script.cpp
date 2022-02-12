@@ -37,8 +37,10 @@ Script::Script(QString path)
         return;
     }
 
-    readScriptHeader(headerPos);
     getOpcodes();
+
+    readScriptHeader(headerPos);
+    readNatives();
 }
 
 void Script::readRSCHeader()
@@ -66,7 +68,7 @@ QByteArray Script::getData()
 
 QList<OpcodeBase> Script::getOpcodes()
 {
-    QFile file(":/opcodes/opcodes.json");
+    QFile file(":/res/rage/opcodes.json");
 
     if (!file.open(QIODevice::ReadOnly))
     {
@@ -155,4 +157,19 @@ void Script::readScriptHeader(int headerPos)
     ReadVar(m_scriptHeader.globalsVers);
     ReadVar(m_scriptHeader.nativesSize);
     ReadPointer(m_scriptHeader.nativesPtr);
+}
+
+void Script::readNatives()
+{
+    QDataStream stream(m_data);
+
+    stream.device()->seek(m_scriptHeader.nativesPtr);
+
+    unsigned int nativeHash;
+
+    for (int i = 0; i < m_scriptHeader.nativesSize; i++)
+    {
+        ReadVar(nativeHash);
+        m_natives.push_back(nativeHash);
+    }
 }

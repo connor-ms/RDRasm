@@ -2,6 +2,7 @@
 
 #include <QFile>
 #include <QMessageBox>
+#include <QTextStream>
 
 #include "lzx.h"
 
@@ -63,4 +64,81 @@ void Util::decompressBuffer(unsigned char *in, unsigned char *out, int outsize)
     }
 
     lzxTeardown(lzx_state);
+}
+
+unsigned int Util::hash(std::string str, bool lowercase)
+{
+    uint32_t value = 0, temp = 0;
+    unsigned int index = 0;
+    bool quoted = false;
+
+    if (str[index] == '"')
+    {
+        quoted = true;
+        index++;
+    }
+
+    // convert to lowercase
+    if (lowercase)
+    {
+        std::transform(str.begin(), str.end(), str.begin(),
+            [](unsigned char c) { return std::tolower(c); });
+    }
+
+    for (; index < str.length(); index++)
+    {
+        char v = str[index];
+
+        if (quoted && (v == '"')) break;
+
+        if (v == '\\')
+            v = '/';
+
+        temp = v;
+        temp = temp + value;
+        value = temp << 10;
+        temp += value;
+        value = temp >> 6;
+        value = value ^ temp;
+    }
+
+    temp = value << 3;
+    temp = value + temp;
+    uint32_t temp2 = temp >> 11;
+    temp = temp2 ^ temp;
+    temp2 = temp << 15;
+
+    value = temp2 + temp;
+
+    if (value < 2) value += 2;
+
+    return value;
+}
+
+QMap<unsigned int, QString> Util::getNatives()
+{
+    QMap<unsigned int, QString> nativeMap;
+
+    QFile natives(":/res/rage/natives.txt");
+
+    if (natives.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&natives);
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+
+            uint32_t hash = Util::hash(line.toStdString());
+
+            nativeMap.insert(hash, line);
+        }
+
+        natives.close();
+    }
+    else
+    {
+        QMessageBox::critical(0, "Error", "Error: Failed to read natives. Only hashes will be available.");
+    }
+
+    return nativeMap;
 }

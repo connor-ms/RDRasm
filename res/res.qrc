@@ -1,5 +1,7 @@
 <RCC>
-    <qresource prefix="/opcodes">
-        <file>opcodes.json</file>
+    <qresource prefix="/res">
+        <file>rage/natives.txt</file>
+        <file>rage/opcodes.json</file>
+        <file>rage/customNatives.txt</file>
     </qresource>
 </RCC>

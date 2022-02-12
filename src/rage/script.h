@@ -51,16 +51,25 @@ public:
     static QList<OpcodeBase> getOpcodes();
 
 private:
+    // Extract script from RSC container
     void readRSCHeader();
     void extractData();
-    int findScriptHeader();
-    void readScriptHeader(int headerPos);
 
+    // Read script data
+    int  findScriptHeader();
+    void readScriptHeader(int headerPos);
+    void readNatives();
+    void readStatics();
+    void readPages();
+
+    // Resource data
     ResourceHeader m_header;
+
+    // Script data
     ScriptHeader m_scriptHeader;
+    QVector<unsigned int> m_natives;
 
     QByteArray m_data;
-
     QFile m_script;
 };
 
