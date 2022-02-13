@@ -41,6 +41,7 @@ Script::Script(QString path)
 
     readScriptHeader(headerPos);
     readNatives();
+    readPages();
 }
 
 void Script::readRSCHeader()
@@ -157,6 +158,9 @@ void Script::readScriptHeader(int headerPos)
     ReadVar(m_scriptHeader.globalsVers);
     ReadVar(m_scriptHeader.nativesSize);
     ReadPointer(m_scriptHeader.nativesPtr);
+
+    // amount of code pages
+    m_scriptHeader.codePagesSize = (m_scriptHeader.codeSize + (1 << 14) - 1) >> 14;
 }
 
 void Script::readNatives()
@@ -171,5 +175,40 @@ void Script::readNatives()
     {
         ReadVar(nativeHash);
         m_natives.push_back(nativeHash);
+    }
+}
+
+void Script::readPages()
+{
+    QDataStream stream(m_data);
+
+    stream.device()->seek(m_scriptHeader.codePagesPtr);
+
+    // get address for each page and read them
+    for (int i = 0; i < m_scriptHeader.codePagesSize; i++)
+    {
+        int address;
+        ReadPointer(address);
+
+        //m_Header.code_pages.push_back(temp);
+        readPage(address, i);
+
+        //qDebug() << "[" << i << "]" << temp;
+    }
+}
+
+void Script::readPage(int address, int page)
+{
+    QDataStream stream(m_data);
+
+    stream.device()->seek(address);
+
+    // set length to 0x4000, unless last page, then set length to remainder
+    int length = (page == m_scriptHeader.codePagesSize) ? m_scriptHeader.codeSize % 0x4000 : 0x4000;
+
+    while (stream.device()->pos() < address + length)
+    {
+        unsigned char opcode;
+        ReadVar(opcode);
     }
 }

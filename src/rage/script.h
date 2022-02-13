@@ -60,7 +60,9 @@ private:
     void readScriptHeader(int headerPos);
     void readNatives();
     void readStatics();
+
     void readPages();
+    void readPage(int address, bool lastPage);
 
     // Resource data
     ResourceHeader m_header;
