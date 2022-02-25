@@ -1,28 +1,23 @@
 #ifndef OPCODE_H
 #define OPCODE_H
 
-#include "opcodebase.h"
+#include <QByteArray>
+#include <QDataStream>
 
-class Opcode : public OpcodeBase
+class Opcode
 {
 public:
-    Opcode(OpcodeBase base);
+    Opcode(QString name, int id, int size);
+    Opcode(Opcode &other);
 
-    QString string();
-
-    int getSize();
-
-    QByteArray getHex();
-    int getOffset();
+    void read(QDataStream *stream);
 
 private:
-    QByteArray m_hex;
-    unsigned int m_offset;
-
+    QString m_name;
+    int m_id;
     int m_size;
 
-    Opcode *m_next;
-    Opcode *m_prev;
+    QByteArray m_data;
 };
 
 #endif // OPCODE_H

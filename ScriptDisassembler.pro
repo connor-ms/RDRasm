@@ -2,7 +2,7 @@ QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++11
+CONFIG += c++17
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
@@ -12,7 +12,7 @@ SOURCES += \
     lib/Qt-AES/qaesencryption.cpp \
     src/main.cpp \
     src/rage/opcode.cpp \
-    src/rage/opcodebase.cpp \
+    src/rage/opcodebuilder.cpp \
     src/rage/script.cpp \
     src/util/lzx.c \
     src/util/util.cpp \
@@ -22,7 +22,7 @@ SOURCES += \
 HEADERS += \
     lib/Qt-AES/qaesencryption.h \
     src/rage/opcode.h \
-    src/rage/opcodebase.h \
+    src/rage/opcodebuilder.h \
     src/rage/script.h \
     src/util/lzx.h \
     src/util/util.h \

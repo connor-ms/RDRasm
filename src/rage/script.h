@@ -4,7 +4,7 @@
 #include <QFile>
 #include <QString>
 
-#include "opcode.h"
+#include "opcodebuilder.h"
 
 struct ResourceHeader
 {
@@ -48,8 +48,6 @@ public:
 
     QByteArray getData();
 
-    static QList<OpcodeBase> getOpcodes();
-
 private:
     // Extract script from RSC container
     void readRSCHeader();
@@ -62,7 +60,7 @@ private:
     void readStatics();
 
     void readPages();
-    void readPage(int address, bool lastPage);
+    void readPage(int address, int page);
 
     // Resource data
     ResourceHeader m_header;
@@ -70,7 +68,11 @@ private:
     // Script data
     ScriptHeader m_scriptHeader;
     QVector<unsigned int> m_natives;
+    QVector<Opcode> m_opcodes;
 
+    OpcodeBuilder m_builder;
+
+    // General data
     QByteArray m_data;
     QFile m_script;
 };

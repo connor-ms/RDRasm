@@ -1,8 +1,5 @@
 #include "script.h"
 
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <QMessageBox>
 #include <QSysInfo>
 
@@ -37,8 +34,6 @@ Script::Script(QString path)
         return;
     }
 
-    getOpcodes();
-
     readScriptHeader(headerPos);
     readNatives();
     readPages();
@@ -67,35 +62,11 @@ QByteArray Script::getData()
     return m_data;
 }
 
-QList<OpcodeBase> Script::getOpcodes()
-{
-    QFile file(":/res/rage/opcodes.json");
-
-    if (!file.open(QIODevice::ReadOnly))
-    {
-        QMessageBox::critical(nullptr, "Error", "Error: failed to open opcode template.");
-        return QList<OpcodeBase>();
-    }
-
-    QJsonDocument document(QJsonDocument::fromJson(file.readAll()));
-
-    QList<OpcodeBase> opcodes;
-
-    foreach(const QJsonValue &v, document.object().value("opcodes").toArray())
-    {
-        QJsonObject obj = v.toObject();
-
-        opcodes.push_back(OpcodeBase(obj.value("name").toString(), obj.value("size").toInt()));
-    }
-
-    return opcodes;
-}
-
 void Script::extractData()
 {
     if (m_header.version == 2)
     {
-        // remove header, since it's unneeded after being read and processed already
+        // remove header
         m_data = m_data.remove(0, 16);
 
         // pad to nearest 16 bytes for AES to be able to decrypt
@@ -109,6 +80,8 @@ void Script::extractData()
         m_data = m_data.remove(0, 8);
 
         int outsize = m_header.getSizeP() + m_header.getSizeV();
+
+        // TODO: fix memory leak here
 
         unsigned char *in  = reinterpret_cast<unsigned char *>(m_data.data());
         unsigned char *out = new unsigned char[outsize];
@@ -210,5 +183,9 @@ void Script::readPage(int address, int page)
     {
         unsigned char opcode;
         ReadVar(opcode);
+
+        m_opcodes.push_back(m_builder.createOpcode(opcode, &stream));
+
+        //buildOpcode(stream);
     }
 }
