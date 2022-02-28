@@ -13,12 +13,12 @@ Disassembler::Disassembler(QString file, QWidget *parent) :
 
     Script script(file);
 
-    QHexDocument *document = QHexDocument::fromMemory<QMemoryRefBuffer>(script.getData());
+    //QHexDocument *document = QHexDocument::fromMemory<QMemoryRefBuffer>(script.getData());
 
-    QHexView *view = new QHexView(this);
-    view->setDocument(document);
+   // QHexView *view = new QHexView(this);
+    //view->setDocument(document);
 
-    m_ui->tabWidget->addTab(view, "Hex View");
+    //m_ui->tabWidget->addTab(view, "Hex View");
 }
 
 Disassembler::~Disassembler()

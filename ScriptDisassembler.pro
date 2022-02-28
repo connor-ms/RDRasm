@@ -11,8 +11,11 @@ CONFIG += c++17
 SOURCES += \
     lib/Qt-AES/qaesencryption.cpp \
     src/main.cpp \
-    src/rage/opcode.cpp \
-    src/rage/opcodebuilder.cpp \
+    src/rage/opcodefactory.cpp \
+    src/rage/opcodes/include.cpp \
+    src/rage/opcodes/methods.cpp \
+    src/rage/opcodes/misc.cpp \
+    src/rage/opcodes/string.cpp \
     src/rage/script.cpp \
     src/util/lzx.c \
     src/util/util.cpp \
@@ -21,8 +24,14 @@ SOURCES += \
 
 HEADERS += \
     lib/Qt-AES/qaesencryption.h \
-    src/rage/opcode.h \
-    src/rage/opcodebuilder.h \
+    src/rage/opcodefactory.h \
+    src/rage/opcodes/float.h \
+    src/rage/opcodes/integer.h \
+    src/rage/opcodes/methods.h \
+    src/rage/opcodes/misc.h \
+    src/rage/opcodes/stack.h \
+    src/rage/opcodes/string.h \
+    src/rage/opcodes/vector.h \
     src/rage/script.h \
     src/util/lzx.h \
     src/util/util.h \

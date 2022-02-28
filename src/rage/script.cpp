@@ -3,6 +3,7 @@
 #include <QMessageBox>
 #include <QSysInfo>
 
+#include "../rage/opcodefactory.h"
 #include "../util/util.h"
 #include "../../lib/Qt-AES/qaesencryption.h"
 
@@ -177,15 +178,18 @@ void Script::readPage(int address, int page)
     stream.device()->seek(address);
 
     // set length to 0x4000, unless last page, then set length to remainder
-    int length = (page == m_scriptHeader.codePagesSize) ? m_scriptHeader.codeSize % 0x4000 : 0x4000;
+    int length = (page == m_scriptHeader.codePagesSize - 1) ? m_scriptHeader.codeSize % 0x4000 : 0x4000;
 
     while (stream.device()->pos() < address + length)
     {
         unsigned char opcode;
         ReadVar(opcode);
 
-        m_opcodes.push_back(m_builder.createOpcode(opcode, &stream));
+        auto op = OpcodeFactory::Create((EOpcodes)opcode);
 
-        //buildOpcode(stream);
+        op->read(&stream);
+        op->setPage(page);
+
+        m_opcodes.push_back(op);
     }
 }

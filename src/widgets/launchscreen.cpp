@@ -6,6 +6,8 @@
 
 #include "disassembler.h"
 
+#include "../rage/opcodefactory.h"
+
 LaunchScreen::LaunchScreen(QWidget *parent) :
     QWidget(parent),
     m_ui(new Ui::LaunchScreen)

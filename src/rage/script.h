@@ -1,10 +1,11 @@
 #ifndef SCRIPT_H
 #define SCRIPT_H
 
+#include <memory>
 #include <QFile>
 #include <QString>
 
-#include "opcodebuilder.h"
+#include "opcodefactory.h"
 
 struct ResourceHeader
 {
@@ -68,9 +69,7 @@ private:
     // Script data
     ScriptHeader m_scriptHeader;
     QVector<unsigned int> m_natives;
-    QVector<Opcode> m_opcodes;
-
-    OpcodeBuilder m_builder;
+    std::vector<std::shared_ptr<IOpcode>> m_opcodes;
 
     // General data
     QByteArray m_data;

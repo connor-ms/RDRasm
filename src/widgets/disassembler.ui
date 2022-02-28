@@ -6,36 +6,93 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>804</width>
-    <height>604</height>
+    <width>806</width>
+    <height>606</height>
    </rect>
+  </property>
+  <property name="font">
+   <font>
+    <family>Segoe UI</family>
+    <pointsize>-1</pointsize>
+   </font>
   </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="font">
+    <font>
+     <family>Segoe UI</family>
+     <pointsize>-1</pointsize>
+    </font>
+   </property>
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <widget class="QTableWidget" name="funcTable">
-      <property name="minimumSize">
-       <size>
-        <width>300</width>
-        <height>0</height>
-       </size>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <property name="leftMargin">
+       <number>0</number>
       </property>
-      <property name="maximumSize">
-       <size>
-        <width>300</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <attribute name="verticalHeaderVisible">
-       <bool>false</bool>
-      </attribute>
-     </widget>
+      <item>
+       <widget class="QLabel" name="lblFunctions">
+        <property name="font">
+         <font>
+          <family>Segoe UI</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Functions</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QTableWidget" name="funcTable">
+        <property name="minimumSize">
+         <size>
+          <width>300</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>500</width>
+          <height>16777215</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>Calibri</family>
+          <pointsize>-1</pointsize>
+         </font>
+        </property>
+        <property name="columnCount">
+         <number>2</number>
+        </property>
+        <attribute name="verticalHeaderVisible">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Address</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Name</string>
+         </property>
+        </column>
+       </widget>
+      </item>
+     </layout>
     </item>
     <item>
      <widget class="QTabWidget" name="tabWidget">
+      <property name="font">
+       <font>
+        <family>Segoe UI</family>
+        <pointsize>-1</pointsize>
+       </font>
+      </property>
       <property name="currentIndex">
        <number>-1</number>
       </property>
@@ -48,8 +105,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>804</width>
-     <height>20</height>
+     <width>806</width>
+     <height>19</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
