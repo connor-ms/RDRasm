@@ -55,11 +55,9 @@ MAKE_SIMPLE_OP(Op_PCall, EOpcodes::OP_PCALL, "pcall", 1);
 
 class Op_SwitchR2 : public IOpcode, public RegisteredInFactory<Op_SwitchR2>
 {
-    REGISTER_IN_FACTORY(Op_SwitchR2, EOpcodes::OP_SWITCHR2)
+    REGISTER(Op_SwitchR2, EOpcodes::OP_SWITCHR2, "switchr2")
 public:
     virtual void read(QDataStream *stream) override;
-
-    virtual QString getName() override { return "switchr2"; };
 };
 
 #endif // MISC_H

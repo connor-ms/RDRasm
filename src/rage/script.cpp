@@ -190,6 +190,11 @@ void Script::readPage(int address, int page)
         op->read(&stream);
         op->setPage(page);
 
+        if (op->getOp() == EOpcodes::OP_ENTER)
+        {
+            m_functions.push_back(op);
+        }
+
         m_opcodes.push_back(op);
     }
 }

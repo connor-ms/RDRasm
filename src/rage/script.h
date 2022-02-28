@@ -49,6 +49,8 @@ public:
 
     QByteArray getData();
 
+    std::vector<std::shared_ptr<IOpcode>> getFunctions() { return m_functions; };
+
 private:
     // Extract script from RSC container
     void readRSCHeader();
@@ -69,7 +71,9 @@ private:
     // Script data
     ScriptHeader m_scriptHeader;
     QVector<unsigned int> m_natives;
+
     std::vector<std::shared_ptr<IOpcode>> m_opcodes;
+    std::vector<std::shared_ptr<IOpcode>> m_functions;
 
     // General data
     QByteArray m_data;

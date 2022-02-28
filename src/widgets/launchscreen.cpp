@@ -9,7 +9,7 @@
 #include "../rage/opcodefactory.h"
 
 LaunchScreen::LaunchScreen(QWidget *parent) :
-    QWidget(parent),
+    QMainWindow(parent),
     m_ui(new Ui::LaunchScreen)
 {
     m_ui->setupUi(this);

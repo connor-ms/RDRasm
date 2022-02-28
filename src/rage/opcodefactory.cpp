@@ -17,12 +17,18 @@ void IOpcode::read(QDataStream *stream)
     }
 }
 
+QString IOpcode::getFormattedSize()
+{
+    QString page = QString::number(getPage(), 16).rightJustified(5, '0').toUpper();
+    QString loc = QString::number(getLocation(), 16).rightJustified(7, '0').toUpper();
+    return page + ":" + loc;
+}
+
 bool OpcodeFactory::Register(const EOpcodes op, TCreateMethod createFunc)
 {
     if (auto it = s_methods.find(op); it == s_methods.end())
     {
         s_methods[op] = createFunc;
-        qInfo() << op << " registered\n";
         return true;
     }
     return false;

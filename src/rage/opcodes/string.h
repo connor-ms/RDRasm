@@ -11,20 +11,16 @@ MAKE_SIMPLE_OP(Op_SNCpy,  EOpcodes::OP_SNCPY,  "sncpy",  1);
 
 class Op_SPush : public IOpcode, public RegisteredInFactory<Op_SPush>
 {
-    REGISTER_IN_FACTORY(Op_SPush, EOpcodes::OP_SPUSH)
+    REGISTER(Op_SPush, EOpcodes::OP_SPUSH, "spush")
 public:
     virtual void read(QDataStream *stream) override;
-
-    virtual QString getName() override { return "spush"; };
 };
 
 class Op_SPushL : public IOpcode, public RegisteredInFactory<Op_SPushL>
 {
-    REGISTER_IN_FACTORY(Op_SPushL, EOpcodes::OP_SPUSHL)
+    REGISTER(Op_SPushL, EOpcodes::OP_SPUSHL, "spuhsl")
 public:
     virtual void read(QDataStream *stream) override;
-
-    virtual QString getName() override { return "spushl"; };
 };
 //OP_SPUSH,
 //OP_SPUSHL,

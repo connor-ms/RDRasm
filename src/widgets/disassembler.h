@@ -3,6 +3,10 @@
 
 #include <QMainWindow>
 
+#include <memory>
+
+#include "../rage/opcodefactory.h"
+
 namespace Ui {
 class Disassembler;
 }
@@ -14,6 +18,8 @@ class Disassembler : public QMainWindow
 public:
     explicit Disassembler(QString file, QWidget *parent = nullptr);
     ~Disassembler();
+
+    void fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs);
 
 private:
     Ui::Disassembler *m_ui;

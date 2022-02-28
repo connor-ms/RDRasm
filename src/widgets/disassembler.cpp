@@ -11,7 +11,11 @@ Disassembler::Disassembler(QString file, QWidget *parent) :
 {
     m_ui->setupUi(this);
 
+    m_ui->funcTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
     Script script(file);
+
+    fillFuncTable(script.getFunctions());
 
     //QHexDocument *document = QHexDocument::fromMemory<QMemoryRefBuffer>(script.getData());
 
@@ -24,4 +28,22 @@ Disassembler::Disassembler(QString file, QWidget *parent) :
 Disassembler::~Disassembler()
 {
     delete m_ui;
+}
+
+
+void Disassembler::fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs)
+{
+    for (auto op : funcs)
+    {
+        int index = m_ui->funcTable->rowCount();
+
+        m_ui->funcTable->setRowCount(index + 1);
+
+        m_ui->funcTable->setItem(index, 0, new QTableWidgetItem(op->getFormattedSize()));
+        m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(QString(op->getData().remove(0, 4))));
+
+        qDebug() << op->getData() << " " << QString(op->getData());
+    }
+
+    m_ui->funcTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::ResizeToContents);
 }

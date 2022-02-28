@@ -51,11 +51,9 @@ MAKE_SIMPLE_OP(Op_Ret, EOpcodes::OP_RET, "ret", 3); // end of func
 
 class Op_Enter : public IOpcode, public RegisteredInFactory<Op_Enter>
 {
-    REGISTER_IN_FACTORY(Op_Enter, EOpcodes::OP_ENTER)
+    REGISTER(Op_Enter, EOpcodes::OP_ENTER, "enter")
 public:
     virtual void read(QDataStream *stream) override;
-
-    virtual QString getName() override { return "enter"; };
 };
 
 #endif // METHODS_H

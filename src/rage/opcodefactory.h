@@ -7,10 +7,12 @@
 #include <QVector>
 
 #define OP_REGISTER(opcode) bool opcode::s_registered = OpcodeFactory::Register(opcode::GetFactoryType(), opcode::CreateMethod)
-#define REGISTER_IN_FACTORY(className, op) public: static std::shared_ptr<IOpcode> CreateMethod() { return std::make_shared<className>(); } \
-                                           static EOpcodes GetFactoryType() { return op; }\
-                                           private: static bool s_registered;
-#define MAKE_SIMPLE_OP(className, op, str, size) class className : public IOpcode, public RegisteredInFactory<className> { REGISTER_IN_FACTORY(className, op) public: virtual QString getName() override { return str; } virtual int getSize() override { return size; } }; OP_REGISTER(className)
+#define REGISTER(className, op, name) public: static std::shared_ptr<IOpcode> CreateMethod() { return std::make_shared<className>(); }\
+                                              static EOpcodes GetFactoryType() { return op; }\
+                                              virtual QString getName() override { return name; }\
+                                              virtual EOpcodes getOp() override { return op; }\
+                                      private: static bool s_registered;
+#define MAKE_SIMPLE_OP(className, op, str, size) class className : public IOpcode, public RegisteredInFactory<className> { REGISTER(className, op, str) virtual int getSize() override { return size; } }; OP_REGISTER(className)
 
 typedef unsigned char byte;
 
@@ -62,10 +64,10 @@ public:
     IOpcode() = default;
     virtual ~IOpcode() = default;
 
-    virtual void    read(QDataStream *stream);
-    virtual QString getName() = 0;
+    virtual void     read(QDataStream *stream);
+    virtual QString  getName() = 0;
+    virtual EOpcodes getOp() = 0;
 
-    virtual EOpcodes     getOp()       { return m_op; }
     virtual QByteArray   getData()     { return m_data; }
     virtual unsigned int getLocation() { return m_location; }
     virtual int          getSize()     { return m_size; };
@@ -73,8 +75,9 @@ public:
     virtual int  getPage()         { return m_page; }
     virtual void setPage(int page) { m_page = page; }
 
+    virtual QString getFormattedSize();
+
 protected:
-    EOpcodes m_op;
     QByteArray m_data;
     unsigned int m_location;
     QVector<IOpcode*> m_references;

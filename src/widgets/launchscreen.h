@@ -1,13 +1,13 @@
 #ifndef LAUNCHSCREEN_H
 #define LAUNCHSCREEN_H
 
-#include <QWidget>
+#include <QMainWindow>
 
 namespace Ui {
 class LaunchScreen;
 }
 
-class LaunchScreen : public QWidget
+class LaunchScreen : public QMainWindow
 {
     Q_OBJECT
 
