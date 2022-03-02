@@ -3,6 +3,7 @@
 #include "widgets/launchscreen.h"
 
 #include <QFile>
+#include <QMessageBox>
 #include <QString>
 
 int main(int argc, char *argv[])
@@ -11,11 +12,12 @@ int main(int argc, char *argv[])
 
     QFile stylesheet(":/res/light.qss");
 
-    stylesheet.open(QIODevice::ReadOnly);
+    if (!stylesheet.open(QIODevice::ReadOnly))
+    {
+        QMessageBox::warning(nullptr, "Warning", "Warning: unable to load stylesheet.");
+    }
 
-    QString test = QLatin1String(stylesheet.readAll());
-
-    a.setStyleSheet(test);
+    a.setStyleSheet(QLatin1String(stylesheet.readAll()));
 
     LaunchScreen ls;
     ls.show();

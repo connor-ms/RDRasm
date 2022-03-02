@@ -4,7 +4,6 @@ void Op_SPush::read(QDataStream *stream)
 {
     m_location = stream->device()->pos();
 
-    QString str;
     byte b;
 
     *stream >> b;
@@ -16,20 +15,29 @@ void Op_SPush::read(QDataStream *stream)
         byte stringByte;
         *stream >> stringByte;
 
-        //str.append(stringByte);
         m_data.push_back(stringByte);
     }
 
     m_size = 2 + b;
+}
 
-    //qDebug() << "string: " << m_data;
+QString Op_SPush::getDataString()
+{
+    // ignore string in data array
+    return QString::number(getOp()) + QString::number(getData()[0], 16);
+}
+
+QString Op_SPush::getArgsString()
+{
+    QString str(getData());
+
+    return "\"" + QString(getData().remove(0, 1)) + "\"";
 }
 
 void Op_SPushL::read(QDataStream *stream)
 {
-
+    // todo
 }
-
 
 OP_REGISTER(Op_SPush);
 OP_REGISTER(Op_SPushL);

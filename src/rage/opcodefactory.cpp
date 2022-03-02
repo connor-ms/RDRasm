@@ -17,11 +17,26 @@ void IOpcode::read(QDataStream *stream)
     }
 }
 
-QString IOpcode::getFormattedSize()
+QString IOpcode::getFormattedLocation()
 {
     QString page = QString::number(getPage(), 16).rightJustified(5, '0').toUpper();
     QString loc = QString::number(getLocation(), 16).rightJustified(7, '0').toUpper();
     return page + ":" + loc;
+}
+
+QString IOpcode::getString()
+{
+    return getFormattedLocation() + "   " + getDataString().leftJustified(10, ' ') + "   " + getName().leftJustified(10) + "   " + getArgsString();
+}
+
+QString IOpcode::getDataString()
+{
+    return QString::number(getOp()) + getData().toHex();
+}
+
+QString IOpcode::getArgsString()
+{
+    return getData().toHex();
 }
 
 bool OpcodeFactory::Register(const EOpcodes op, TCreateMethod createFunc)

@@ -42,7 +42,7 @@ Script::Script(QString path)
 
 void Script::readRSCHeader()
 {
-    // Read data from header, which is uncompressed and unencrypted
+    // Read data from header, which doesn't need to be uncompressed or unencrypted
 
     QDataStream stream(m_data);
 
@@ -53,14 +53,9 @@ void Script::readRSCHeader()
     stream >> m_header.flags2;
 
     m_header.vSize = (int)(m_header.flags2 & 0x7FFF);
-    m_header.pSze = (int)((m_header.flags2 & 0xFFF7000) >> 14);
+    m_header.pSize = (int)((m_header.flags2 & 0xFFF7000) >> 14);
     m_header._f14_30 = (int)(m_header.flags2 & 0x70000000);
     m_header.extended = (m_header.flags2 & 0x80000000) == 0x80000000 ? true : false;
-}
-
-QByteArray Script::getData()
-{
-    return m_data;
 }
 
 void Script::extractData()
@@ -164,10 +159,7 @@ void Script::readPages()
         int address;
         ReadPointer(address);
 
-        //m_Header.code_pages.push_back(temp);
         readPage(address, i);
-
-        //qDebug() << "[" << i << "]" << temp;
     }
 }
 

@@ -66,16 +66,19 @@ public:
 
     virtual void     read(QDataStream *stream);
     virtual QString  getName() = 0;
-    virtual EOpcodes getOp() = 0;
+    virtual EOpcodes getOp()   = 0;
 
-    virtual QByteArray   getData()     { return m_data; }
+    virtual QByteArray   getData()     { return m_data;     }
     virtual unsigned int getLocation() { return m_location; }
-    virtual int          getSize()     { return m_size; };
+    virtual int          getSize()     { return m_size;     }
 
     virtual int  getPage()         { return m_page; }
     virtual void setPage(int page) { m_page = page; }
 
-    virtual QString getFormattedSize();
+    virtual QString getFormattedLocation(); // page:offset
+    virtual QString getString();            // full string
+    virtual QString getDataString();        // formatted raw data
+    virtual QString getArgsString();        // formatted arguments of op
 
 protected:
     QByteArray m_data;

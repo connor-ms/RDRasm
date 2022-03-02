@@ -15,12 +15,12 @@ struct ResourceHeader
     int flags2;
 
     int vSize;
-    int pSze;
+    int pSize;
     int _f14_30;
     bool extended;
 
     int getSizeV() { return extended ? (vSize << 12) : ((int)(flags1 & 0x7FF) << ((int)((flags1 >> 11) & 15) + 8)); }
-    int getSizeP() { return extended ? (pSze << 12) : ((int)((flags1 >> 15) & 0x7FF) << ((int)((flags1 >> 26) & 15) + 8)); }
+    int getSizeP() { return extended ? (pSize << 12) : ((int)((flags1 >> 15) & 0x7FF) << ((int)((flags1 >> 26) & 15) + 8)); }
 };
 
 struct ScriptHeader
@@ -47,9 +47,10 @@ class Script
 public:
     Script(QString path);
 
-    QByteArray getData();
+    QByteArray getData() { return m_data; };
 
     std::vector<std::shared_ptr<IOpcode>> getFunctions() { return m_functions; };
+    std::vector<std::shared_ptr<IOpcode>> getOpcodes()   { return m_opcodes;   };
 
 private:
     // Extract script from RSC container

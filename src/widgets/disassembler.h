@@ -2,10 +2,12 @@
 #define DISASSEMBLER_H
 
 #include <QMainWindow>
+#include <QTextEdit>
 
 #include <memory>
 
 #include "../rage/opcodefactory.h"
+#include "../rage/script.h"
 
 namespace Ui {
 class Disassembler;
@@ -19,10 +21,12 @@ public:
     explicit Disassembler(QString file, QWidget *parent = nullptr);
     ~Disassembler();
 
-    void fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs);
-
 private:
+    void fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs);
+    void fillDisassembly(QTextEdit *disasm);
+
     Ui::Disassembler *m_ui;
+    Script m_script;
 };
 
 #endif // DISASSEMBLER_H

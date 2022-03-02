@@ -3,8 +3,8 @@
 
 #include "../opcodefactory.h"
 
-MAKE_SIMPLE_OP(Op_Drop,      EOpcodes::OP_DROP, "drop", 1);
-MAKE_SIMPLE_OP(Op_ToStack,   EOpcodes::OP_TOSTACK, "tostack", 1);
+MAKE_SIMPLE_OP(Op_Drop,      EOpcodes::OP_DROP,      "drop",      1);
+MAKE_SIMPLE_OP(Op_ToStack,   EOpcodes::OP_TOSTACK,   "tostack",   1);
 MAKE_SIMPLE_OP(Op_FromStack, EOpcodes::OP_FROMSTACK, "fromstack", 1);
 
 MAKE_SIMPLE_OP(Op_StackGetP, EOpcodes::OP_STACKGETP, "stackgetp", 2);
