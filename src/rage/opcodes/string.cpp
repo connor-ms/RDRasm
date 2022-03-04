@@ -15,7 +15,14 @@ void Op_SPush::read(QDataStream *stream)
         byte stringByte;
         *stream >> stringByte;
 
-        m_data.push_back(stringByte);
+        if (stringByte == 0x0A)
+        {
+            m_data.push_back("\\n");
+        }
+        else
+        {
+            m_data.push_back(stringByte);
+        }
     }
 
     m_size = 2 + b;
@@ -29,8 +36,7 @@ QString Op_SPush::getDataString()
 
 QString Op_SPush::getArgsString()
 {
-    QString str(getData());
-
+    // only return string
     return "\"" + QString(getData().remove(0, 1)) + "\"";
 }
 

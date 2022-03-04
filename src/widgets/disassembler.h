@@ -2,6 +2,7 @@
 #define DISASSEMBLER_H
 
 #include <QMainWindow>
+#include <QTableWidget>
 #include <QTextEdit>
 
 #include <memory>
@@ -23,6 +24,9 @@ public:
 
 private:
     void fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs);
+    QTextEdit *createDisassemblyTab();
+    QTableWidget *createStringsTab();
+
     void fillDisassembly(QTextEdit *disasm);
 
     Ui::Disassembler *m_ui;

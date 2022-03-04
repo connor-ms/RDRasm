@@ -189,6 +189,10 @@ void Script::readPage(int address, int page)
         {
             m_functions.push_back(op);
         }
+        else if (op->getOp() == EOpcodes::OP_SPUSH || op->getOp() == EOpcodes::OP_SPUSHL)
+        {
+            m_strings.push_back(op);
+        }
 
         m_opcodes.push_back(op);
     }

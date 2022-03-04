@@ -14,17 +14,8 @@ Disassembler::Disassembler(QString file, QWidget *parent)
     m_ui->funcTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     fillFuncTable(m_script.getFunctions());
-
-    QTextEdit *disasm = new QTextEdit(this);
-
-    disasm->setWordWrapMode(QTextOption::NoWrap);
-    disasm->setFont(QFont("Consolas", 10));
-
-    m_ui->tabWidget->addTab(disasm, "Disassembly");
-
-    fillDisassembly(disasm);
-
-    disasm->moveCursor(QTextCursor::Start);
+    createDisassemblyTab();
+    createStringsTab();
 }
 
 Disassembler::~Disassembler()
@@ -45,6 +36,43 @@ void Disassembler::fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs)
     }
 
     m_ui->funcTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::ResizeToContents);
+}
+
+QTextEdit *Disassembler::createDisassemblyTab()
+{
+    QTextEdit *disasm = new QTextEdit(this);
+
+    disasm->setWordWrapMode(QTextOption::NoWrap);
+    disasm->setFont(QFont("Consolas", 10));
+
+    m_ui->tabWidget->addTab(disasm, "Disassembly");
+
+    fillDisassembly(disasm);
+
+    disasm->moveCursor(QTextCursor::Start);
+
+    return disasm;
+}
+
+QTableWidget *Disassembler::createStringsTab()
+{
+    QTableWidget *stringTable = new QTableWidget(m_script.getStrings().size(), 2, this);
+
+    stringTable->setHorizontalHeaderLabels({"Location", "String"});
+    stringTable->verticalHeader()->setVisible(false);
+    stringTable->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeMode::Stretch);
+
+    for (unsigned int i = 0; i < m_script.getStrings().size(); i++)
+    {
+        auto op = m_script.getStrings()[i];
+
+        stringTable->setItem(i, 0, new QTableWidgetItem(op->getFormattedLocation()));
+        stringTable->setItem(i, 1, new QTableWidgetItem(op->getArgsString()));
+    }
+
+    m_ui->tabWidget->addTab(stringTable, "Strings");
+
+    return stringTable;
 }
 
 void Disassembler::fillDisassembly(QTextEdit *textEdit)
