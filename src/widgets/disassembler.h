@@ -24,7 +24,8 @@ public:
 
 private:
     void fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs);
-    QTextEdit *createDisassemblyTab();
+
+    QTextEdit    *createDisassemblyTab();
     QTableWidget *createStringsTab();
 
     void fillDisassembly(QTextEdit *disasm);

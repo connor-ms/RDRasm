@@ -83,13 +83,18 @@ void Disassembler::fillDisassembly(QTextEdit *textEdit)
     {
         textEdit->moveCursor(QTextCursor::End);
 
+        if (m_script.getJumps().count(op->getLocation()) == 1)
+        {
+            textEdit->insertPlainText(QString(m_script.getJumps().at(op->getLocation()) + '\n').rightJustified(26));
+        }
+
         if (op->getOp() == EOpcodes::OP_ENTER)
         {
             QString funcName;
 
             if (op->getArgsString().isEmpty() && funcCount > 0)
             {
-                funcName = QString("func_%1").arg(funcCount);
+                funcName = "func_" + QString::number(funcCount).rightJustified(5, '0');
             }
             else if (funcCount == 0)
             {
@@ -103,6 +108,11 @@ void Disassembler::fillDisassembly(QTextEdit *textEdit)
             textEdit->insertPlainText(QString("%1%2   %3 (%4 args):\n").arg(funcCount == 0 ? "" : "\n").arg(op->getFormattedLocation()).arg(funcName).arg(QString::number(op->getData()[0])));
 
             funcCount++;
+        }
+        else if (op->getOp() >= EOpcodes::OP_JMP && op->getOp() <= EOpcodes::OP_JMPGT)
+        {
+            int jumpPos = op->getData()[1] + op->getLocation() + 3;
+            textEdit->insertPlainText(op->getFormattedLocation() + "   " + op->getDataString().leftJustified(10, ' ') + "   " + op->getName().leftJustified(10) + "   " + m_script.getJumps().at(jumpPos) + '\n');
         }
         else
         {

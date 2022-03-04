@@ -37,15 +37,14 @@ MAKE_SIMPLE_OP(Op_Ret3R1, EOpcodes::OP_RET3R1, "ret3r1", 1); // return: 3 parame
 MAKE_SIMPLE_OP(Op_Ret3R2, EOpcodes::OP_RET3R2, "ret3r2", 1); // return: 3 parameters, 2 results
 MAKE_SIMPLE_OP(Op_Ret3R3, EOpcodes::OP_RET3R3, "ret3r3", 1); // return: 3 parameters, 3 results
 
-// Jumps
-MAKE_SIMPLE_OP(Op_JR2,   EOpcodes::OP_JR2,   "jr2",   3);
-MAKE_SIMPLE_OP(Op_JFR2,  EOpcodes::OP_JFR2,  "jfr2",  3);
-MAKE_SIMPLE_OP(Op_JNER2, EOpcodes::OP_JNER2, "jner2", 3);
-MAKE_SIMPLE_OP(Op_JEQR2, EOpcodes::OP_JEQR2, "jeqr2", 3);
-MAKE_SIMPLE_OP(Op_JLER2, EOpcodes::OP_JLER2, "jler2", 3);
-MAKE_SIMPLE_OP(Op_JLTR2, EOpcodes::OP_JLTR2, "jltr2", 3);
-MAKE_SIMPLE_OP(Op_JGER2, EOpcodes::OP_JGER2, "jger2", 3);
-MAKE_SIMPLE_OP(Op_JGTR2, EOpcodes::OP_JGTR2, "jgtr2", 3);
+MAKE_SIMPLE_OP(Op_Jmp,   EOpcodes::OP_JMP,   "jmp",   3); // jump relative
+MAKE_SIMPLE_OP(Op_JmpF,  EOpcodes::OP_JMPF,  "jmpf",  3); // jump false
+MAKE_SIMPLE_OP(Op_JmpNe, EOpcodes::OP_JMPNE, "jmpne", 3); // jump not equal
+MAKE_SIMPLE_OP(Op_JmpEq, EOpcodes::OP_JMPEQ, "jmpeq", 3); // jump equal
+MAKE_SIMPLE_OP(Op_JmpLe, EOpcodes::OP_JMPLE, "jmple", 3); // jump <=
+MAKE_SIMPLE_OP(Op_JmpLt, EOpcodes::OP_JMPLT, "jmplt", 3); // jump <
+MAKE_SIMPLE_OP(Op_JmpGe, EOpcodes::OP_JMPGE, "jmpge", 3); // jump >=
+MAKE_SIMPLE_OP(Op_JmpGt, EOpcodes::OP_JMPGT, "jmpgt", 3); // jump >
 
 MAKE_SIMPLE_OP(Op_Ret, EOpcodes::OP_RET, "ret", 3); // end of func
 

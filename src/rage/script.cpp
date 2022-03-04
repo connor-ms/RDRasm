@@ -174,6 +174,7 @@ void Script::readPage(int address, int page)
 
     // set length to 0x4000, unless last page, then set length to remainder
     int length = (page == m_scriptHeader.codePagesSize - 1) ? m_scriptHeader.codeSize % 0x4000 : 0x4000;
+    int jumpCount = 0;
 
     while (stream.device()->pos() < address + length)
     {
@@ -192,6 +193,13 @@ void Script::readPage(int address, int page)
         else if (op->getOp() == EOpcodes::OP_SPUSH || op->getOp() == EOpcodes::OP_SPUSHL)
         {
             m_strings.push_back(op);
+        }
+        else if (op->getOp() >= EOpcodes::OP_JMP && op->getOp() <= EOpcodes::OP_JMPGT)
+        {
+            int jumpPos = op->getData()[1] + op->getLocation() + 3;
+
+            m_jumps.insert(std::pair<int, QString>(jumpPos, "sub_" + QString::number(jumpCount).rightJustified(5, '0')));
+            jumpCount++;
         }
 
         m_opcodes.push_back(op);
