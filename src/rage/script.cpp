@@ -28,7 +28,7 @@ Script::Script(QString path)
     // Begin disassembling script once extracted from resource file
     int headerPos = findScriptHeader();
 
-    if (headerPos == 0)
+    if (headerPos == -1)
     {
         // TODO: message box with retry option, due to occasional decompression errors
         QMessageBox::critical(nullptr, "Error", "Error: Unable to find script header.");
@@ -65,19 +65,21 @@ void Script::extractData()
         // remove header
         m_data = m_data.remove(0, 16);
 
+        int oldsize = m_data.size();
+
         // pad to nearest 16 bytes for AES to be able to decrypt
         m_data.resize(m_data.size() + (16 - (m_data.size() % 16)));
 
         for (int i = 0; i < 0x10; i++)
         {
-            m_data = QAESEncryption::Decrypt(QAESEncryption::Aes::AES_256, QAESEncryption::Mode::ECB, m_data, Util::getAESKey());
+            m_data = QAESEncryption::Decrypt(QAESEncryption::Aes::AES_256, QAESEncryption::Mode::ECB, m_data, Util::getAESKey(), QByteArray(), QAESEncryption::ZERO);
         }
 
-        m_data = m_data.remove(0, 8);
+        // remove padding
+        m_data.remove(oldsize, m_data.size());
+        m_data.remove(0, 8);
 
         int outsize = m_header.getSizeP() + m_header.getSizeV();
-
-        // TODO: fix memory leak here
 
         unsigned char *in  = reinterpret_cast<unsigned char *>(m_data.data());
         unsigned char *out = new unsigned char[outsize];
@@ -108,7 +110,8 @@ int Script::findScriptHeader()
         stream.device()->seek(headerOffset);
     }
 
-    return headerOffset;
+    // return -1 if header wasn't found
+    return headerOffset == m_data.size() ? -1 : headerOffset;
 }
 
 void Script::readScriptHeader(int headerPos)
