@@ -7,7 +7,7 @@
 
 #include <memory>
 
-#include "../rage/opcodefactory.h"
+#include "../rage/iopcode.h"
 #include "../rage/script.h"
 
 namespace Ui {
