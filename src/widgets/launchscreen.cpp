@@ -15,8 +15,8 @@ LaunchScreen::LaunchScreen(QWidget *parent) :
     m_ui->setupUi(this);
 
     connect(m_ui->btnOpenFile, SIGNAL(clicked()), this, SLOT(openFilePressed()));
-    connect(m_ui->btnGithub, SIGNAL(clicked()), this, SLOT(githubPressed()));
-    connect(m_ui->btnExit, SIGNAL(clicked()), this, SLOT(exitPressed()));
+    connect(m_ui->btnGithub,   SIGNAL(clicked()), this, SLOT(githubPressed()));
+    connect(m_ui->btnExit,     SIGNAL(clicked()), this, SLOT(exitPressed()));
 }
 
 LaunchScreen::~LaunchScreen()
