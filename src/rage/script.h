@@ -49,7 +49,7 @@ public:
 
     QByteArray getData() { return m_data; };
 
-    std::vector<std::shared_ptr<IOpcode>> getOpcodes()   { return m_opcodes;   }
+    std::list<std::shared_ptr<IOpcode>> getOpcodes()     { return m_opcodes;   }
     std::vector<std::shared_ptr<IOpcode>> getFunctions() { return m_functions; }
     std::vector<std::shared_ptr<IOpcode>> getStrings()   { return m_strings;   }
     std::map<unsigned int, QString> getJumps()           { return m_jumps;     }
@@ -75,7 +75,8 @@ private:
     ScriptHeader m_scriptHeader;
     QVector<unsigned int> m_natives;
 
-    std::vector<std::shared_ptr<IOpcode>> m_opcodes;
+    //std::vector<std::shared_ptr<IOpcode>> m_opcodes;
+    std::list<std::shared_ptr<IOpcode>> m_opcodes;
     std::vector<std::shared_ptr<IOpcode>> m_functions;
     std::vector<std::shared_ptr<IOpcode>> m_strings;
     std::map<unsigned int, QString>       m_jumps;

@@ -81,6 +81,9 @@ void Disassembler::fillDisassembly(QTextEdit *textEdit)
 
     for (auto op : m_script.getOpcodes())
     {
+        if (op->getOp() == EOpcodes::OP_NOP)
+            continue;
+
         textEdit->moveCursor(QTextCursor::End);
 
         if (m_script.getJumps().count(op->getLocation()) == 1)
