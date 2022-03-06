@@ -142,3 +142,15 @@ QMap<unsigned int, QString> Util::getNatives()
 
     return nativeMap;
 }
+
+QString Util::getNative(unsigned int key, QMap<unsigned int, QString> natives)
+{
+    if (natives.count(key) == 1)
+    {
+        return natives.value(key);
+    }
+    else
+    {
+        return QString("UNK_0x%1").arg(key, 0, 16);
+    }
+}

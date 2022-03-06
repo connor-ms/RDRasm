@@ -1,6 +1,7 @@
 #include "disassembler.h"
 #include "ui_disassembler.h"
 
+#include "../util/util.h"
 #include "../QHexView/qhexview.h"
 #include "../QHexView/document/buffer/qmemoryrefbuffer.h"
 
@@ -12,6 +13,8 @@ Disassembler::Disassembler(QString file, QWidget *parent)
     m_ui->setupUi(this);
 
     m_ui->funcTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+
+    m_nativeMap = Util::getNatives();
 
     fillFuncTable(m_script.getFunctions());
     createDisassemblyTab();
@@ -91,7 +94,21 @@ void Disassembler::fillDisassembly(QTextEdit *textEdit)
             textEdit->insertPlainText(QString(m_script.getJumps().at(op->getLocation()) + '\n').rightJustified(26));
         }
 
-        if (op->getOp() == EOpcodes::OP_ENTER)
+        if (op->getOp() == EOpcodes::OP_NATIVE)
+        {
+            int native   = ((op->getData()[0] << 2) & 0x300) | op->getData()[1];
+            int argCount = (op->getData()[0] & 0x3e) >> 1;
+            bool hasRets = (op->getData()[0] & 1) == 1 ? true : false;
+
+            textEdit->insertPlainText(QString("%1   %2   %3   %4 (%5 args, ret %6)\n").arg(op->getFormattedLocation())
+                                                                            .arg(op->getDataString().leftJustified(10, ' '))
+                                                                            .arg(op->getName().leftJustified(10))
+                                                                            .arg(Util::getNative(m_script.getNatives()[native], m_nativeMap))
+                                                                            .arg(argCount)
+                                                                            .arg(hasRets));
+
+        }
+        else if (op->getOp() == EOpcodes::OP_ENTER)
         {
             QString funcName;
 

@@ -53,6 +53,7 @@ public:
     std::vector<std::shared_ptr<IOpcode>> getFunctions() { return m_functions; }
     std::vector<std::shared_ptr<IOpcode>> getStrings()   { return m_strings;   }
     std::map<unsigned int, QString> getJumps()           { return m_jumps;     }
+    QVector<unsigned int> getNatives()                   { return m_natives;   }
 
 private:
     // Extract script from RSC container

@@ -30,6 +30,8 @@ private:
 
     void fillDisassembly(QTextEdit *disasm);
 
+    QMap<unsigned int, QString> m_nativeMap;
+
     Ui::Disassembler *m_ui;
     Script m_script;
 };
