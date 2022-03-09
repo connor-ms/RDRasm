@@ -1,6 +1,10 @@
 #include "disassembler.h"
 #include "ui_disassembler.h"
 
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QTextStream>
+
 #include "../util/util.h"
 #include "../QHexView/qhexview.h"
 #include "../QHexView/document/buffer/qmemoryrefbuffer.h"
@@ -9,6 +13,7 @@ Disassembler::Disassembler(QString file, QWidget *parent)
     : QMainWindow(parent)
     , m_ui(new Ui::Disassembler)
     , m_script(file)
+    , m_file(file)
 {
     m_ui->setupUi(this);
 
@@ -19,11 +24,65 @@ Disassembler::Disassembler(QString file, QWidget *parent)
     fillFuncTable(m_script.getFunctions());
     createDisassemblyTab();
     createStringsTab();
+
+    connect(m_ui->actionExportDisassembly, SIGNAL(triggered()), this, SLOT(exportDisassembly()));
+    connect(m_ui->actionExportRawData,     SIGNAL(triggered()), this, SLOT(exportRawData()));
 }
 
 Disassembler::~Disassembler()
 {
     delete m_ui;
+}
+
+void Disassembler::exportDisassembly()
+{
+    QString filePath = QFileDialog::getSaveFileName(this, "Export disassembly", m_file.split("\\").last().split(".xsc").first(), "Text (*.txt)");
+    QFile file(filePath);
+
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        QMessageBox::critical(this, "Error", "Error: unable to write to file. Make sure the file isn't open elsewhere.");
+        return;
+    }
+
+    QString str;
+
+    for (int row = 0; row < m_disasm->rowCount(); row++)
+    {
+        for (int col = 0; col < m_disasm->columnCount(); col++)
+        {
+            QTableWidgetItem *item = m_disasm->item(row, col);
+
+            if (item != nullptr)
+            {
+                str += m_disasm->item(row, col)->text().leftJustified(15);
+            }
+        }
+
+        str += "\n";
+    }
+
+    QTextStream stream(&file);
+
+    stream << str;
+
+    file.close();
+}
+
+void Disassembler::exportRawData()
+{
+    QString filePath = QFileDialog::getSaveFileName(this, "Export raw data", m_file.split("\\").last().split(".xsc").first(), "Binary data (*.bin)");
+    QFile file(filePath);
+
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        QMessageBox::critical(this, "Error", "Error: unable to write to file. Make sure the file isn't open elsewhere.");
+        return;
+    }
+
+    file.write(m_script.getData());
+
+    file.close();
 }
 
 void Disassembler::fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs)
@@ -41,28 +100,26 @@ void Disassembler::fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs)
     m_ui->funcTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::ResizeToContents);
 }
 
-OpcodeTable *Disassembler::createDisassemblyTab()
+void Disassembler::createDisassemblyTab()
 {
-    OpcodeTable *disasm = new OpcodeTable(0, 4, m_ui->tabWidget);
+    m_disasm = new OpcodeTable(0, 4, m_ui->tabWidget);
 
-    disasm->setFont(QFont("Courier", 10));
-    disasm->setHorizontalHeaderLabels({ "Address", "Bytes", "Opcode", "Data" });
-    disasm->setColumnWidth(0, 125);
-    disasm->setShowGrid(false);
+    m_disasm->setFont(QFont("Courier", 10));
+    m_disasm->setHorizontalHeaderLabels({ "Address", "Bytes", "Opcode", "Data" });
+    m_disasm->setColumnWidth(0, 125);
+    m_disasm->setShowGrid(false);
 
-    disasm->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
-    disasm->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
+    m_disasm->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+    m_disasm->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
 
-    QHeaderView *verticalHeader = disasm->verticalHeader();
+    QHeaderView *verticalHeader = m_disasm->verticalHeader();
     verticalHeader->setSectionResizeMode(QHeaderView::Fixed);
     verticalHeader->setDefaultSectionSize(10);
     verticalHeader->setVisible(false);
 
-    m_ui->tabWidget->addTab(disasm, "Disassembly");
+    m_ui->tabWidget->addTab(m_disasm, "Disassembly");
 
-    fillDisassembly(disasm);
-
-    return disasm;
+    fillDisassembly();
 }
 
 QTableWidget *Disassembler::createStringsTab()
@@ -86,7 +143,7 @@ QTableWidget *Disassembler::createStringsTab()
     return stringTable;
 }
 
-void Disassembler::fillDisassembly(QTableWidget *disasm)
+void Disassembler::fillDisassembly()
 {
     int funcCount = 0;
 
@@ -103,16 +160,16 @@ void Disassembler::fillDisassembly(QTableWidget *disasm)
         opcode->setForeground(QColor(48,  98, 174));
         bytes->setForeground(QColor(120, 120, 120));
 
-        int index = disasm->rowCount();
-        disasm->setRowCount(index + 1);
+        int index = m_disasm->rowCount();
+        m_disasm->setRowCount(index + 1);
 
         if (m_script.getJumps().count(op->getLocation()) == 1)
         {
             QTableWidgetItem *jump = new QTableWidgetItem(QString(":" + m_script.getJumps().at(op->getLocation())));
             jump->setForeground(QColor(255, 0, 0));
 
-            disasm->setItem(index++, 1, jump);
-            disasm->insertRow(index);
+            m_disasm->setItem(index++, 1, jump);
+            m_disasm->insertRow(index);
         }
 
         if (op->getOp() == EOpcodes::OP_NATIVE)
@@ -147,7 +204,7 @@ void Disassembler::fillDisassembly(QTableWidget *disasm)
 
             if (funcCount != 1)
             {
-                disasm->insertRow(index++);
+                m_disasm->insertRow(index++);
             }
         }
         else if (op->getOp() >= EOpcodes::OP_JMP && op->getOp() <= EOpcodes::OP_JMPGT)
@@ -157,9 +214,9 @@ void Disassembler::fillDisassembly(QTableWidget *disasm)
             data->setForeground(QColor(255, 0, 0));
         }
 
-        disasm->setItem(index, 0, address);
-        disasm->setItem(index, 1, bytes);
-        disasm->setItem(index, 2, opcode);
-        disasm->setItem(index, 3, data);
+        m_disasm->setItem(index, 0, address);
+        m_disasm->setItem(index, 1, bytes);
+        m_disasm->setItem(index, 2, opcode);
+        m_disasm->setItem(index, 3, data);
     }
 }

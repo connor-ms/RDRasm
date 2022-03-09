@@ -22,18 +22,24 @@ public:
     explicit Disassembler(QString file, QWidget *parent = nullptr);
     ~Disassembler();
 
+public slots:
+    void exportDisassembly();
+    void exportRawData();
+
 private:
     void fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs);
 
-    OpcodeTable  *createDisassemblyTab();
+    void createDisassemblyTab();
     QTableWidget *createStringsTab();
 
-    void fillDisassembly(QTableWidget *disasm);
+    void fillDisassembly();
 
     QMap<unsigned int, QString> m_nativeMap;
 
     Ui::Disassembler *m_ui;
     Script m_script;
+    QString m_file;
+    OpcodeTable *m_disasm;
 };
 
 #endif // DISASSEMBLER_H
