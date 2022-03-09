@@ -2,11 +2,11 @@
 #define DISASSEMBLER_H
 
 #include <QMainWindow>
-#include <QTableWidget>
 #include <QTextEdit>
 
 #include <memory>
 
+#include "opcodetable.h"
 #include "../rage/iopcode.h"
 #include "../rage/script.h"
 
@@ -25,10 +25,10 @@ public:
 private:
     void fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs);
 
-    QTextEdit    *createDisassemblyTab();
+    OpcodeTable  *createDisassemblyTab();
     QTableWidget *createStringsTab();
 
-    void fillDisassembly(QTextEdit *disasm);
+    void fillDisassembly(QTableWidget *disasm);
 
     QMap<unsigned int, QString> m_nativeMap;
 

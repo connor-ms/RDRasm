@@ -21,7 +21,8 @@ SOURCES += \
     src/util/lzx.c \
     src/util/util.cpp \
     src/widgets/disassembler.cpp \
-    src/widgets/launchscreen.cpp
+    src/widgets/launchscreen.cpp \
+    src/widgets/opcodetable.cpp
 
 HEADERS += \
     lib/Qt-AES/qaesencryption.h \
@@ -38,7 +39,8 @@ HEADERS += \
     src/util/lzx.h \
     src/util/util.h \
     src/widgets/disassembler.h \
-    src/widgets/launchscreen.h
+    src/widgets/launchscreen.h \
+    src/widgets/opcodetable.h
 
 FORMS += \
     src/widgets/disassembler.ui \

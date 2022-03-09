@@ -76,8 +76,7 @@ private:
     ScriptHeader m_scriptHeader;
     QVector<unsigned int> m_natives;
 
-    //std::vector<std::shared_ptr<IOpcode>> m_opcodes;
-    std::list<std::shared_ptr<IOpcode>> m_opcodes;
+    std::list<std::shared_ptr<IOpcode>>   m_opcodes;
     std::vector<std::shared_ptr<IOpcode>> m_functions;
     std::vector<std::shared_ptr<IOpcode>> m_strings;
     std::map<unsigned int, QString>       m_jumps;

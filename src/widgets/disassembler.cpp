@@ -41,18 +41,26 @@ void Disassembler::fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs)
     m_ui->funcTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::ResizeToContents);
 }
 
-QTextEdit *Disassembler::createDisassemblyTab()
+OpcodeTable *Disassembler::createDisassemblyTab()
 {
-    QTextEdit *disasm = new QTextEdit(this);
+    OpcodeTable *disasm = new OpcodeTable(0, 4, m_ui->tabWidget);
 
-    disasm->setWordWrapMode(QTextOption::NoWrap);
-    disasm->setFont(QFont("Consolas", 10));
+    disasm->setFont(QFont("Courier", 10));
+    disasm->setHorizontalHeaderLabels({ "Address", "Bytes", "Opcode", "Data" });
+    disasm->setColumnWidth(0, 125);
+    disasm->setShowGrid(false);
+
+    disasm->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+    disasm->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
+
+    QHeaderView *verticalHeader = disasm->verticalHeader();
+    verticalHeader->setSectionResizeMode(QHeaderView::Fixed);
+    verticalHeader->setDefaultSectionSize(10);
+    verticalHeader->setVisible(false);
 
     m_ui->tabWidget->addTab(disasm, "Disassembly");
 
     fillDisassembly(disasm);
-
-    disasm->moveCursor(QTextCursor::Start);
 
     return disasm;
 }
@@ -78,7 +86,7 @@ QTableWidget *Disassembler::createStringsTab()
     return stringTable;
 }
 
-void Disassembler::fillDisassembly(QTextEdit *textEdit)
+void Disassembler::fillDisassembly(QTableWidget *disasm)
 {
     int funcCount = 0;
 
@@ -87,11 +95,24 @@ void Disassembler::fillDisassembly(QTextEdit *textEdit)
         if (op->getOp() == EOpcodes::OP_NOP)
             continue;
 
-        textEdit->moveCursor(QTextCursor::End);
+        QTableWidgetItem *address = new QTableWidgetItem(op->getFormattedLocation());
+        QTableWidgetItem *bytes   = new QTableWidgetItem(op->getDataString());
+        QTableWidgetItem *opcode  = new QTableWidgetItem(op->getName());
+        QTableWidgetItem *data    = new QTableWidgetItem(op->getArgsString());
+
+        opcode->setForeground(QColor(48,  98, 174));
+        bytes->setForeground(QColor(120, 120, 120));
+
+        int index = disasm->rowCount();
+        disasm->setRowCount(index + 1);
 
         if (m_script.getJumps().count(op->getLocation()) == 1)
         {
-            textEdit->insertPlainText(QString(m_script.getJumps().at(op->getLocation()) + '\n').rightJustified(26));
+            QTableWidgetItem *jump = new QTableWidgetItem(QString(":" + m_script.getJumps().at(op->getLocation())));
+            jump->setForeground(QColor(255, 0, 0));
+
+            disasm->setItem(index++, 1, jump);
+            disasm->insertRow(index);
         }
 
         if (op->getOp() == EOpcodes::OP_NATIVE)
@@ -100,12 +121,9 @@ void Disassembler::fillDisassembly(QTextEdit *textEdit)
             int argCount = (op->getData()[0] & 0x3e) >> 1;
             bool hasRets = (op->getData()[0] & 1) == 1 ? true : false;
 
-            textEdit->insertPlainText(QString("%1   %2   %3   %4 (%5 args, ret %6)\n").arg(op->getFormattedLocation())
-                                                                            .arg(op->getDataString().leftJustified(10, ' '))
-                                                                            .arg(op->getName().leftJustified(10))
-                                                                            .arg(Util::getNative(m_script.getNatives()[native], m_nativeMap))
-                                                                            .arg(argCount)
-                                                                            .arg(hasRets));
+            data->setText(QString("%1 (%2 args, ret %3)").arg(Util::getNative(m_script.getNatives()[native], m_nativeMap))
+                                                         .arg(argCount)
+                                                         .arg(hasRets));
 
         }
         else if (op->getOp() == EOpcodes::OP_ENTER)
@@ -125,18 +143,23 @@ void Disassembler::fillDisassembly(QTextEdit *textEdit)
                 funcName = op->getArgsString();
             }
 
-            textEdit->insertPlainText(QString("%1%2   %3 (%4 args):\n").arg(funcCount == 0 ? "" : "\n").arg(op->getFormattedLocation()).arg(funcName).arg(QString::number(op->getData()[0])));
-
             funcCount++;
+
+            if (funcCount != 1)
+            {
+                disasm->insertRow(index++);
+            }
         }
         else if (op->getOp() >= EOpcodes::OP_JMP && op->getOp() <= EOpcodes::OP_JMPGT)
         {
             int jumpPos = op->getData()[1] + op->getLocation() + 3;
-            textEdit->insertPlainText(op->getFormattedLocation() + "   " + op->getDataString().leftJustified(10, ' ') + "   " + op->getName().leftJustified(10) + "   " + m_script.getJumps().at(jumpPos) + '\n');
+            data->setText("@" + m_script.getJumps().at(jumpPos));
+            data->setForeground(QColor(255, 0, 0));
         }
-        else
-        {
-            textEdit->insertPlainText(op->getString() + "\n");
-        }
+
+        disasm->setItem(index, 0, address);
+        disasm->setItem(index, 1, bytes);
+        disasm->setItem(index, 2, opcode);
+        disasm->setItem(index, 3, data);
     }
 }
