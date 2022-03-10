@@ -24,6 +24,7 @@ Disassembler::Disassembler(QString file, QWidget *parent)
     fillFuncTable(m_script.getFunctions());
     createDisassemblyTab();
     createStringsTab();
+    createScriptDataTab();
 
     connect(m_ui->actionExportDisassembly, SIGNAL(triggered()), this, SLOT(exportDisassembly()));
     connect(m_ui->actionExportRawData,     SIGNAL(triggered()), this, SLOT(exportRawData()));
@@ -69,6 +70,18 @@ void Disassembler::exportDisassembly()
     file.close();
 }
 
+void Disassembler::createScriptDataTab()
+{
+    QTextEdit *scriptData = new QTextEdit(this);
+
+    scriptData->setFont(QFont("Courier", 10));
+
+    m_ui->tabWidget->addTab(scriptData, "Script Data");
+
+    scriptData->append(getResourceHeaderData());
+    scriptData->append(getScriptHeaderData());
+}
+
 void Disassembler::exportRawData()
 {
     QString filePath = QFileDialog::getSaveFileName(this, "Export raw data", m_file.split("\\").last().split(".xsc").first(), "Binary data (*.bin)");
@@ -83,6 +96,46 @@ void Disassembler::exportRawData()
     file.write(m_script.getData());
 
     file.close();
+}
+
+QString Disassembler::getResourceHeaderData()
+{
+    QString resourceData;
+
+    resourceData.append("Resource data:\n");
+    resourceData.append(QString("    magic: %1\n").arg(m_script.getResourceHeader().magic));
+    resourceData.append(QString("    version: %1\n").arg(m_script.getResourceHeader().version));
+    resourceData.append(QString("    flags1: %1\n").arg(m_script.getResourceHeader().flags1));
+    resourceData.append(QString("    flags2: %1\n").arg(m_script.getResourceHeader().flags2));
+    resourceData.append(QString("    vsize: %1\n").arg(m_script.getResourceHeader().vSize));
+    resourceData.append(QString("    psize: %1\n").arg(m_script.getResourceHeader().pSize));
+    resourceData.append(QString("    _f14_30: %1\n").arg(m_script.getResourceHeader()._f14_30));
+    resourceData.append(QString("    extended: %1\n").arg(m_script.getResourceHeader().extended));
+    resourceData.append(QString("    virtual size: %1\n").arg(m_script.getResourceHeader().getSizeV()));
+    resourceData.append(QString("    physical size: %1\n\n").arg(m_script.getResourceHeader().getSizeP()));
+
+    return resourceData;
+}
+
+QString Disassembler::getScriptHeaderData()
+{
+    QString scriptData;
+
+    scriptData.append("Script data:\n");
+    scriptData.append(QString("    headerPos: %1\n").arg(m_script.getScriptHeader().headerPos));
+    scriptData.append(QString("    magic: %1\n").arg(m_script.getScriptHeader().magic));
+    scriptData.append(QString("    pageMapPtr: %1\n").arg(m_script.getScriptHeader().pageMapPtr));
+    scriptData.append(QString("    codeSize: %1\n").arg(m_script.getScriptHeader().codeSize));
+    scriptData.append(QString("    paramCount: %1\n").arg(m_script.getScriptHeader().paramCount));
+    scriptData.append(QString("    staticsSize: %1\n").arg(m_script.getScriptHeader().staticsSize));
+    scriptData.append(QString("    staticsPtr: %1\n").arg(m_script.getScriptHeader().staticsPtr));
+    scriptData.append(QString("    globalsVers: %1\n").arg(m_script.getScriptHeader().globalsVers));
+    scriptData.append(QString("    nativesSize: %1\n").arg(m_script.getScriptHeader().nativesSize));
+    scriptData.append(QString("    nativesPtr: %1\n").arg(m_script.getScriptHeader().nativesPtr));
+    scriptData.append(QString("    codePagesSize: %1\n").arg(m_script.getScriptHeader().codePagesSize));
+    scriptData.append(QString("    codePagesPtr: %1\n").arg(m_script.getScriptHeader().codePagesPtr));
+
+    return scriptData;
 }
 
 void Disassembler::fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs)

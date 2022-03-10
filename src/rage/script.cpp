@@ -26,16 +26,16 @@ Script::Script(QString path)
     extractData();
 
     // Begin disassembling script once extracted from resource file
-    int headerPos = findScriptHeader();
+    m_scriptHeader.headerPos = findScriptHeader();
 
-    if (headerPos == -1)
+    if (m_scriptHeader.headerPos == -1)
     {
         // TODO: message box with retry option, due to occasional decompression errors
         QMessageBox::critical(nullptr, "Error", "Error: Unable to find script header.");
         return;
     }
 
-    readScriptHeader(headerPos);
+    readScriptHeader(m_scriptHeader.headerPos);
     readNatives();
     readPages();
 }

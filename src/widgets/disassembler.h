@@ -28,11 +28,14 @@ public slots:
 
 private:
     void fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs);
+    void fillDisassembly();
 
     void createDisassemblyTab();
+    void createScriptDataTab();
     QTableWidget *createStringsTab();
 
-    void fillDisassembly();
+    QString getResourceHeaderData();
+    QString getScriptHeaderData();
 
     QMap<unsigned int, QString> m_nativeMap;
 

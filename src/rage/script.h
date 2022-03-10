@@ -40,6 +40,8 @@ struct ScriptHeader
     int codePagesSize;
     int codePagesPtr;
     std::vector<int> codePages;
+
+    int headerPos;
 };
 
 class Script
@@ -48,6 +50,9 @@ public:
     Script(QString path);
 
     QByteArray getData() { return m_data; };
+
+    ResourceHeader getResourceHeader() { return m_header;       }
+    ScriptHeader   getScriptHeader()   { return m_scriptHeader; }
 
     std::list<std::shared_ptr<IOpcode>> getOpcodes()     { return m_opcodes;   }
     std::vector<std::shared_ptr<IOpcode>> getFunctions() { return m_functions; }
