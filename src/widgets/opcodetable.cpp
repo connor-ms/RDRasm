@@ -9,6 +9,9 @@ OpcodeTable::OpcodeTable(int rows, int columns, QWidget *parent)
     : QTableWidget(rows, columns, parent)
 {
     setContextMenuPolicy(Qt::CustomContextMenu);
+    setSelectionBehavior(QAbstractItemView::SelectRows);
+    setSelectionMode(QAbstractItemView::SingleSelection);
+    setEditTriggers(QAbstractItemView::NoEditTriggers);
 
     connect(this, &QTableWidget::customContextMenuRequested, this, &OpcodeTable::displayContextMenu);
 }
