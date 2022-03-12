@@ -9,7 +9,7 @@
 
 struct ResourceHeader
 {
-    int magic;
+    unsigned int magic;
     int version;
     int flags1;
     int flags2;
@@ -62,7 +62,7 @@ public:
 
 private:
     // Extract script from RSC container
-    void readRSCHeader();
+    bool readRSCHeader();
     void extractData();
 
     // Read script data

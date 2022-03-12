@@ -19,34 +19,60 @@ Script::Script(QString path)
         return;
     }
 
-    m_data = m_script.readAll();
+    QMessageBox msgBox;
+    QAbstractButton *retryButton  = (QAbstractButton*)msgBox.addButton("Retry", QMessageBox::YesRole);
+    QAbstractButton *cancelButton = (QAbstractButton*)msgBox.addButton("Cancel", QMessageBox::NoRole);
 
-    // Decompress and unencrypt script from inside resource file
-    readRSCHeader();
-    extractData();
+    msgBox.setText("Error: Unable to read script. May be due to decompression issues, so if you're sure it's a valid script retrying may fix it.");
 
-    // Begin disassembling script once extracted from resource file
-    m_scriptHeader.headerPos = findScriptHeader();
+    m_scriptHeader.headerPos = -1;
 
-    if (m_scriptHeader.headerPos == -1)
+    do
     {
-        // TODO: message box with retry option, due to occasional decompression errors
-        QMessageBox::critical(nullptr, "Error", "Error: Unable to find script header.");
-        return;
+        m_data = m_script.readAll();
+
+        // Decompress and unencrypt script from inside resource file
+        if (readRSCHeader() == false)
+        {
+            QMessageBox::critical(nullptr, "Error", "Error: Invalid script.");
+
+            return;
+        }
+
+        extractData();
+
+        // Begin disassembling script once extracted from resource file
+        m_scriptHeader.headerPos = findScriptHeader();
+
+        if (m_scriptHeader.headerPos == -1)
+        {
+            msgBox.exec();
+
+            if (msgBox.clickedButton() == cancelButton)
+            {
+                return;
+            }
+        }
     }
+    while (m_scriptHeader.headerPos == -1 && msgBox.clickedButton() == retryButton);
 
     readScriptHeader(m_scriptHeader.headerPos);
     readNatives();
     readPages();
 }
 
-void Script::readRSCHeader()
+bool Script::readRSCHeader()
 {
     // Read data from header, which doesn't need to be uncompressed or unencrypted
 
     QDataStream stream(m_data);
 
     stream >> m_header.magic;
+
+    if (m_header.magic != 0x85435352)
+    {
+        return false;
+    }
 
     stream >> m_header.version;
     stream >> m_header.flags1;
@@ -56,6 +82,8 @@ void Script::readRSCHeader()
     m_header.pSize = (int)((m_header.flags2 & 0xFFF7000) >> 14);
     m_header._f14_30 = (int)(m_header.flags2 & 0x70000000);
     m_header.extended = (m_header.flags2 & 0x80000000) == 0x80000000 ? true : false;
+
+    return true;
 }
 
 void Script::extractData()
@@ -93,16 +121,18 @@ void Script::extractData()
 int Script::findScriptHeader()
 {
     int headerOffset = 0;
+    bool found = false;
 
     QDataStream stream(m_data);
 
-    while (headerOffset < m_data.size())
+    while (headerOffset <= m_data.size())
     {
         int magic;
         stream >> magic;
 
         if (magic == -1462287616)
         {
+            found = true;
             break;
         }
 
@@ -111,7 +141,7 @@ int Script::findScriptHeader()
     }
 
     // return -1 if header wasn't found
-    return headerOffset == m_data.size() ? -1 : headerOffset;
+    return found ? headerOffset : -1;
 }
 
 void Script::readScriptHeader(int headerPos)
