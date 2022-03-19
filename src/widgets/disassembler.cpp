@@ -140,6 +140,8 @@ QString Disassembler::getScriptHeaderData()
 
 void Disassembler::fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs)
 {
+    int funcCount = 0;
+
     for (auto op : funcs)
     {
         int index = m_ui->funcTable->rowCount();
@@ -147,7 +149,26 @@ void Disassembler::fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs)
         m_ui->funcTable->setRowCount(index + 1);
 
         m_ui->funcTable->setItem(index, 0, new QTableWidgetItem(op->getFormattedLocation()));
-        m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(QString(op->getData().remove(0, 4))));
+
+        QByteArray data = op->getData().remove(0, 4);
+
+        if (data.isEmpty())
+        {
+            if (funcCount == 0)
+            {
+                m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(QString("__entrypoint")));
+            }
+            else
+            {
+                m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(QString("func_%1").arg(funcCount)));
+            }
+        }
+        else
+        {
+            m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(QString(data)));
+        }
+
+        funcCount++;
     }
 
     m_ui->funcTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::ResizeToContents);
