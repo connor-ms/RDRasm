@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>340</width>
-    <height>400</height>
+    <width>300</width>
+    <height>350</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -19,22 +19,22 @@
   <property name="minimumSize">
    <size>
     <width>300</width>
-    <height>400</height>
+    <height>350</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>340</width>
-    <height>400</height>
+    <width>300</width>
+    <height>350</height>
    </size>
   </property>
   <property name="windowTitle">
-   <string>RDR Script Disassembler</string>
+   <string>RDRasm</string>
   </property>
   <widget class="QLabel" name="lblSplash">
    <property name="geometry">
     <rect>
-     <x>40</x>
+     <x>20</x>
      <y>30</y>
      <width>261</width>
      <height>91</height>
@@ -42,12 +42,12 @@
    </property>
    <property name="font">
     <font>
-     <family>Calibri Light</family>
-     <pointsize>17</pointsize>
+     <family>Consolas</family>
+     <pointsize>19</pointsize>
     </font>
    </property>
    <property name="text">
-    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Red Dead Redemption&lt;br/&gt;Script Disassembler&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;RDRasm&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
@@ -56,8 +56,8 @@
   <widget class="QPushButton" name="btnOpenFile">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>180</y>
+     <x>40</x>
+     <y>160</y>
      <width>221</width>
      <height>41</height>
     </rect>
@@ -69,8 +69,8 @@
   <widget class="QPushButton" name="btnGithub">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>230</y>
+     <x>40</x>
+     <y>210</y>
      <width>221</width>
      <height>41</height>
     </rect>
@@ -82,8 +82,8 @@
   <widget class="QPushButton" name="btnExit">
    <property name="geometry">
     <rect>
-     <x>60</x>
-     <y>280</y>
+     <x>40</x>
+     <y>260</y>
      <width>221</width>
      <height>41</height>
     </rect>

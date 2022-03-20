@@ -28,6 +28,13 @@ Disassembler::Disassembler(QString file, QWidget *parent)
 
     connect(m_ui->actionExportDisassembly, SIGNAL(triggered()), this, SLOT(exportDisassembly()));
     connect(m_ui->actionExportRawData,     SIGNAL(triggered()), this, SLOT(exportRawData()));
+
+    connect(m_ui->actionExit, SIGNAL(triggered()), this, SLOT(exit()));
+    connect(m_ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
+
+    setWindowTitle("RDRasm - " + file);
+
+    QApplication::setOverrideCursor(Qt::ArrowCursor);
 }
 
 Disassembler::~Disassembler()
@@ -70,18 +77,6 @@ void Disassembler::exportDisassembly()
     file.close();
 }
 
-void Disassembler::createScriptDataTab()
-{
-    QTextEdit *scriptData = new QTextEdit(this);
-
-    scriptData->setFont(QFont("Courier", 10));
-
-    m_ui->tabWidget->addTab(scriptData, "Script Data");
-
-    scriptData->append(getResourceHeaderData());
-    scriptData->append(getScriptHeaderData());
-}
-
 void Disassembler::exportRawData()
 {
     QString filePath = QFileDialog::getSaveFileName(this, "Export raw data", m_file.split("\\").last().split(".xsc").first(), "Binary data (*.bin)");
@@ -96,6 +91,38 @@ void Disassembler::exportRawData()
     file.write(m_script.getData());
 
     file.close();
+}
+
+void Disassembler::exit()
+{
+    QApplication::exit();
+}
+
+void Disassembler::open()
+{
+    QString file = QFileDialog::getOpenFileName(this, "Select a file", "", "Script (*.xsc)");
+
+    if (!file.isEmpty())
+    {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+
+        Disassembler *dsm = new Disassembler(file);
+        dsm->show();
+
+        close();
+    }
+}
+
+void Disassembler::createScriptDataTab()
+{
+    QTextEdit *scriptData = new QTextEdit(this);
+
+    scriptData->setFont(QFont("Courier", 10));
+
+    m_ui->tabWidget->addTab(scriptData, "Script Data");
+
+    scriptData->append(getResourceHeaderData());
+    scriptData->append(getScriptHeaderData());
 }
 
 QString Disassembler::getResourceHeaderData()

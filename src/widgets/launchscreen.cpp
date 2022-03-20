@@ -30,6 +30,8 @@ void LaunchScreen::openFilePressed()
 
     if (!file.isEmpty())
     {
+        QApplication::setOverrideCursor(Qt::WaitCursor);
+
         Disassembler *dsm = new Disassembler(file);
         dsm->show();
 

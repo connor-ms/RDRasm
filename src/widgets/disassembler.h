@@ -25,6 +25,8 @@ public:
 public slots:
     void exportDisassembly();
     void exportRawData();
+    void exit();
+    void open();
 
 private:
     void fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs);

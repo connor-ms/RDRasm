@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>830</width>
-    <height>610</height>
+    <width>832</width>
+    <height>612</height>
    </rect>
   </property>
   <property name="font">
@@ -17,7 +17,7 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>RDRasm</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <property name="font">
@@ -139,7 +139,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>830</width>
+     <width>832</width>
      <height>19</height>
     </rect>
    </property>
