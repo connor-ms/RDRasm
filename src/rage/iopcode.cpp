@@ -22,10 +22,10 @@ QString IOpcode::getFormattedLocation()
 
 QString IOpcode::getDataString()
 {
-    return QString::number(getOp()) + getData().toHex();
+    return QString::number(getOp()) + getData().toHex().toUpper();
 }
 
 QString IOpcode::getArgsString()
 {
-    return getData().toHex();
+    return getData().toHex().toUpper();
 }

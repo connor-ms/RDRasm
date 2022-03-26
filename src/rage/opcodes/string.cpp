@@ -31,7 +31,7 @@ void Op_SPush::read(QDataStream *stream)
 QString Op_SPush::getDataString()
 {
     // ignore string in data array
-    return QString::number(getOp()) + QString::number(getData()[0], 16);
+    return QString::number(getOp()) + QString::number(getData()[0], 16).toUpper();
 }
 
 QString Op_SPush::getArgsString()

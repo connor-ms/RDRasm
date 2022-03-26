@@ -28,7 +28,7 @@ void Op_Enter::read(QDataStream *stream)
 QString Op_Enter::getDataString()
 {
     // ignore func name in data string
-    return getData().remove(4, getData().size()).toHex();
+    return getData().remove(4, getData().size()).toHex().toUpper();
 }
 
 QString Op_Enter::getArgsString()

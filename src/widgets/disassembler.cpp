@@ -246,6 +246,7 @@ void Disassembler::fillDisassembly()
                                                          .arg(argCount)
                                                          .arg(hasRets));
 
+            data->setFont(funcFont);
         }
         else if (op->getOp() == EOpcodes::OP_ENTER)
         {
