@@ -13,6 +13,18 @@ OpcodeTable::OpcodeTable(int rows, int columns, QWidget *parent)
     setSelectionMode(QAbstractItemView::SingleSelection);
     setEditTriggers(QAbstractItemView::NoEditTriggers);
 
+    setFont(QFont("Roboto Mono", 10));
+    setHorizontalHeaderLabels({ "Address", "Bytes", "Opcode", "Data" });
+    setColumnWidth(0, 125);
+    setShowGrid(false);
+
+    horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
+    horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
+
+    verticalHeader()->setSectionResizeMode(QHeaderView::Fixed);
+    verticalHeader()->setDefaultSectionSize(10);
+    verticalHeader()->setVisible(false);
+
     connect(this, &QTableWidget::customContextMenuRequested, this, &OpcodeTable::displayContextMenu);
 }
 

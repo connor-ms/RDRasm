@@ -41,7 +41,7 @@ void LaunchScreen::openFilePressed()
 
 void LaunchScreen::githubPressed()
 {
-    QDesktopServices::openUrl(QUrl("www.github.com/connorms/ScriptDisassembler"));
+    QDesktopServices::openUrl(QUrl("www.github.com/connorms/RDRasm"));
 }
 
 void LaunchScreen::exitPressed()

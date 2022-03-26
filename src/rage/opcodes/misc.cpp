@@ -2,6 +2,8 @@
 
 void Op_SwitchR2::read(QDataStream *stream)
 {
+    m_location = stream->device()->pos() - 1;
+
     byte b1;
     int temp;
     short temp2;

@@ -29,10 +29,8 @@ public slots:
     void open();
 
 private:
-    void fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs);
     void fillDisassembly();
 
-    void createDisassemblyTab();
     void createScriptDataTab();
     QTableWidget *createStringsTab();
 

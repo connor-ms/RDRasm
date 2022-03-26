@@ -2,7 +2,7 @@
 
 void Op_SPush::read(QDataStream *stream)
 {
-    m_location = stream->device()->pos();
+    m_location = stream->device()->pos() - 1;
 
     byte b;
 

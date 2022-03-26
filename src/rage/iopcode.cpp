@@ -2,7 +2,7 @@
 
 void IOpcode::read(QDataStream *stream)
 {
-    m_location = stream->device()->pos();
+    m_location = stream->device()->pos() - 1;
 
     byte b;
 
@@ -18,11 +18,6 @@ QString IOpcode::getFormattedLocation()
     QString page = QString::number(getPage(), 16).rightJustified(5, '0').toUpper();
     QString loc = QString::number(getLocation(), 16).rightJustified(7, '0').toUpper();
     return page + ":" + loc;
-}
-
-QString IOpcode::getString()
-{
-    return getFormattedLocation() + "   " + getDataString().leftJustified(10, ' ') + "   " + getName().leftJustified(10) + "   " + getArgsString();
 }
 
 QString IOpcode::getDataString()

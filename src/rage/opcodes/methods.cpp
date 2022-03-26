@@ -2,7 +2,7 @@
 
 void Op_Enter::read(QDataStream *stream)
 {
-    m_location = stream->device()->pos();
+    m_location = stream->device()->pos() - 1;
 
     byte b;
 
@@ -35,11 +35,6 @@ QString Op_Enter::getArgsString()
 {
     // only return func name
     return getData().remove(0, 4);
-}
-
-QString Op_Enter::getString()
-{
-    return getFormattedLocation() + "  " + getArgsString();
 }
 
 OP_REGISTER(Op_Enter);

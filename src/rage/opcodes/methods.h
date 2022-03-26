@@ -55,7 +55,6 @@ public:
     virtual void read(QDataStream *stream) override;
     virtual QString getDataString() override;
     virtual QString getArgsString() override;
-    virtual QString getString() override;
 };
 
 #endif // METHODS_H

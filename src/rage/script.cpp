@@ -11,7 +11,8 @@
 #define ReadPointer(x) stream >> x; x = x & 0xffffff;
 
 Script::Script(QString path)
-    : m_script(path)
+    : m_funcCount(0)
+    , m_script(path)
 {
     if (!m_script.open(QIODevice::ReadOnly))
     {
@@ -186,14 +187,34 @@ void Script::readPages()
 
     stream.device()->seek(m_scriptHeader.codePagesPtr);
 
-    // get address for each page and read them
+    int prevEnd = 0;
+
+    // get address for each page and read it
     for (int i = 0; i < m_scriptHeader.codePagesSize; i++)
     {
         int address;
         ReadPointer(address);
 
+        m_pageOffsets.push_back(address - prevEnd);
+        m_pageLocations.push_back(address);
+
+        prevEnd = address + 0x4000;
+
         readPage(address, i);
     }
+}
+
+unsigned int Script::getPageByLocation(unsigned int location)
+{
+    for (unsigned int i = 0; i < m_pageLocations.size(); i++)
+    {
+        if (m_pageLocations[i] <= location && m_pageLocations[i] + 0x4000 >= location)
+        {
+            return i;
+        }
+    }
+
+    return 0;
 }
 
 void Script::readPage(int address, int page)
@@ -218,7 +239,28 @@ void Script::readPage(int address, int page)
 
         if (op->getOp() == EOpcodes::OP_ENTER)
         {
-            m_functions.push_back(op);
+            QString funcName;
+
+            if (op->getArgsString().isEmpty() && m_funcCount > 0)
+            {
+                funcName = "func_" + QString::number(m_funcCount).rightJustified(5, '0');
+            }
+            else if (m_funcCount == 0)
+            {
+                funcName = "__entrypoint";
+            }
+            else
+            {
+                funcName = op->getArgsString();
+            }
+
+            if (m_funcNames.count(op->getLocation()) == 0)
+            {
+                int offset = op->getLocation();
+                m_funcNames.insert(std::pair<unsigned int, QString>(offset, funcName));
+            }
+
+            m_funcCount++;
         }
         else if (op->getOp() == EOpcodes::OP_SPUSH || op->getOp() == EOpcodes::OP_SPUSHL)
         {

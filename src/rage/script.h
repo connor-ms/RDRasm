@@ -54,11 +54,18 @@ public:
     ResourceHeader getResourceHeader() { return m_header;       }
     ScriptHeader   getScriptHeader()   { return m_scriptHeader; }
 
-    std::list<std::shared_ptr<IOpcode>> getOpcodes()     { return m_opcodes;   }
-    std::vector<std::shared_ptr<IOpcode>> getFunctions() { return m_functions; }
-    std::vector<std::shared_ptr<IOpcode>> getStrings()   { return m_strings;   }
-    std::map<unsigned int, QString> getJumps()           { return m_jumps;     }
-    QVector<unsigned int> getNatives()                   { return m_natives;   }
+    std::list<std::shared_ptr<IOpcode>>   getOpcodes() { return m_opcodes; }
+    std::vector<std::shared_ptr<IOpcode>> getStrings() { return m_strings; }
+    std::map<unsigned int, QString>       getJumps()   { return m_jumps;   }
+    QVector<unsigned int>                 getNatives() { return m_natives; }
+
+    std::map<int, QString> getFuncNames() { return m_funcNames; }
+    unsigned int getFuncCount()           { return m_funcCount; }
+
+    std::vector<unsigned int> getPageOffsets()   { return m_pageOffsets;   }
+    std::vector<unsigned int> getPageLocations() { return m_pageLocations; }
+
+    unsigned int getPageByLocation(unsigned int location);
 
 private:
     // Extract script from RSC container
@@ -81,10 +88,16 @@ private:
     ScriptHeader m_scriptHeader;
     QVector<unsigned int> m_natives;
 
-    std::list<std::shared_ptr<IOpcode>>   m_opcodes;
-    std::vector<std::shared_ptr<IOpcode>> m_functions;
+    std::vector<unsigned int> m_pageOffsets;
+    std::vector<unsigned int> m_pageLocations;
+
+    std::list<std::shared_ptr<IOpcode>> m_opcodes;
+
+    unsigned int m_funcCount;
+    std::map<int, QString> m_funcNames;
+
     std::vector<std::shared_ptr<IOpcode>> m_strings;
-    std::map<unsigned int, QString>       m_jumps;
+    std::map<unsigned int, QString> m_jumps;
 
     // General data
     QByteArray m_data;

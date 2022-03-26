@@ -21,8 +21,10 @@ Disassembler::Disassembler(QString file, QWidget *parent)
 
     m_nativeMap = Util::getNatives();
 
-    fillFuncTable(m_script.getFunctions());
-    createDisassemblyTab();
+    m_disasm = new OpcodeTable(0, 4, m_ui->tabWidget);
+    m_ui->tabWidget->addTab(m_disasm, "Disassembly");
+
+    fillDisassembly();
     createStringsTab();
     createScriptDataTab();
 
@@ -45,6 +47,12 @@ Disassembler::~Disassembler()
 void Disassembler::exportDisassembly()
 {
     QString filePath = QFileDialog::getSaveFileName(this, "Export disassembly", m_file.split("\\").last().split(".xsc").first(), "Text (*.txt)");
+
+    if (filePath.isEmpty())
+    {
+        return;
+    }
+
     QFile file(filePath);
 
     if (!file.open(QIODevice::WriteOnly))
@@ -75,11 +83,19 @@ void Disassembler::exportDisassembly()
     stream << str;
 
     file.close();
+
+    QMessageBox::information(this, "Exported", "Successfully exported to " + filePath);
 }
 
 void Disassembler::exportRawData()
 {
     QString filePath = QFileDialog::getSaveFileName(this, "Export raw data", m_file.split("\\").last().split(".xsc").first(), "Binary data (*.bin)");
+
+    if (filePath.isEmpty())
+    {
+        return;
+    }
+
     QFile file(filePath);
 
     if (!file.open(QIODevice::WriteOnly))
@@ -91,6 +107,8 @@ void Disassembler::exportRawData()
     file.write(m_script.getData());
 
     file.close();
+
+    QMessageBox::information(this, "Exported", "Successfully exported to " + filePath);
 }
 
 void Disassembler::exit()
@@ -117,7 +135,7 @@ void Disassembler::createScriptDataTab()
 {
     QTextEdit *scriptData = new QTextEdit(this);
 
-    scriptData->setFont(QFont("Courier", 10));
+    scriptData->setFont(QFont("Roboto Mono", 10));
 
     m_ui->tabWidget->addTab(scriptData, "Script Data");
 
@@ -165,64 +183,6 @@ QString Disassembler::getScriptHeaderData()
     return scriptData;
 }
 
-void Disassembler::fillFuncTable(std::vector<std::shared_ptr<IOpcode>> funcs)
-{
-    int funcCount = 0;
-
-    for (auto op : funcs)
-    {
-        int index = m_ui->funcTable->rowCount();
-
-        m_ui->funcTable->setRowCount(index + 1);
-
-        m_ui->funcTable->setItem(index, 0, new QTableWidgetItem(op->getFormattedLocation()));
-
-        QByteArray data = op->getData().remove(0, 4);
-
-        if (data.isEmpty())
-        {
-            if (funcCount == 0)
-            {
-                m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(QString("__entrypoint")));
-            }
-            else
-            {
-                m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(QString("func_%1").arg(funcCount)));
-            }
-        }
-        else
-        {
-            m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(QString(data)));
-        }
-
-        funcCount++;
-    }
-
-    m_ui->funcTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::ResizeToContents);
-}
-
-void Disassembler::createDisassemblyTab()
-{
-    m_disasm = new OpcodeTable(0, 4, m_ui->tabWidget);
-
-    m_disasm->setFont(QFont("Courier", 10));
-    m_disasm->setHorizontalHeaderLabels({ "Address", "Bytes", "Opcode", "Data" });
-    m_disasm->setColumnWidth(0, 125);
-    m_disasm->setShowGrid(false);
-
-    m_disasm->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeMode::Stretch);
-    m_disasm->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::Fixed);
-
-    QHeaderView *verticalHeader = m_disasm->verticalHeader();
-    verticalHeader->setSectionResizeMode(QHeaderView::Fixed);
-    verticalHeader->setDefaultSectionSize(10);
-    verticalHeader->setVisible(false);
-
-    m_ui->tabWidget->addTab(m_disasm, "Disassembly");
-
-    fillDisassembly();
-}
-
 QTableWidget *Disassembler::createStringsTab()
 {
     QTableWidget *stringTable = new QTableWidget(m_script.getStrings().size(), 2, this);
@@ -246,7 +206,7 @@ QTableWidget *Disassembler::createStringsTab()
 
 void Disassembler::fillDisassembly()
 {
-    int funcCount = 0;
+    int invalidCalls = 0;
 
     for (auto op : m_script.getOpcodes())
     {
@@ -257,6 +217,9 @@ void Disassembler::fillDisassembly()
         QTableWidgetItem *bytes   = new QTableWidgetItem(op->getDataString());
         QTableWidgetItem *opcode  = new QTableWidgetItem(op->getName());
         QTableWidgetItem *data    = new QTableWidgetItem(op->getArgsString());
+
+        QColor funcCol(0, 12, 140);
+        QFont funcFont("Roboto Mono Bold", 10);
 
         opcode->setForeground(QColor(48,  98, 174));
         bytes->setForeground(QColor(120, 120, 120));
@@ -286,27 +249,54 @@ void Disassembler::fillDisassembly()
         }
         else if (op->getOp() == EOpcodes::OP_ENTER)
         {
-            QString funcName;
-
-            if (op->getArgsString().isEmpty() && funcCount > 0)
-            {
-                funcName = "func_" + QString::number(funcCount).rightJustified(5, '0');
-            }
-            else if (funcCount == 0)
-            {
-                funcName = "__entrypoint";
-            }
-            else
-            {
-                funcName = op->getArgsString();
-            }
-
-            funcCount++;
-
-            if (funcCount != 1)
+            if (m_script.getFuncNames().at(op->getLocation()) != "__entrypoint")
             {
                 m_disasm->insertRow(index++);
             }
+
+            data->setText(m_script.getFuncNames().at(op->getLocation()));
+
+            address->setFont(funcFont);
+            bytes->setFont(funcFont);
+            opcode->setFont(funcFont);
+            data->setFont(funcFont);
+
+            address->setForeground(funcCol);
+            bytes->setForeground(funcCol);
+            opcode->setForeground(funcCol);
+            data->setForeground(funcCol);
+
+            // add function to func table
+            int index = m_ui->funcTable->rowCount();
+
+            m_ui->funcTable->setRowCount(index + 1);
+
+            m_ui->funcTable->setItem(index, 0, new QTableWidgetItem(op->getFormattedLocation()));
+            m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(m_script.getFuncNames().at(op->getLocation())));
+        }
+        else if (op->getOp() >= EOpcodes::OP_CALL2 && op->getOp() <= EOpcodes::OP_CALL2HF)
+        {
+            QDataStream str(op->getData());
+
+            unsigned short funcLoc;
+            str >> funcLoc;
+
+            int callOffset = (funcLoc | (op->getOp() - 0x52) << 0x10);
+
+            callOffset += m_script.getPageOffsets()[m_script.getPageByLocation(callOffset)];
+
+            if (m_script.getFuncNames().count(callOffset) == 0)
+            {
+                data->setText(QString("??? (%1)").arg(callOffset, 5, 16));
+                invalidCalls++;
+            }
+            else
+            {
+                data->setText(m_script.getFuncNames().at(callOffset));
+            }
+
+            data->setFont(funcFont);
+            data->setForeground(funcCol);
         }
         else if (op->getOp() >= EOpcodes::OP_JMP && op->getOp() <= EOpcodes::OP_JMPGT)
         {
@@ -320,4 +310,11 @@ void Disassembler::fillDisassembly()
         m_disasm->setItem(index, 2, opcode);
         m_disasm->setItem(index, 3, data);
     }
+
+    if (invalidCalls > 0)
+    {
+        QMessageBox::warning(this, "Warning", QString("Warning: %1 invalid calls found.").arg(invalidCalls));
+    }
+
+    m_ui->funcTable->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeMode::ResizeToContents);
 }
