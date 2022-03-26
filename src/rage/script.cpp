@@ -241,7 +241,7 @@ void Script::readPage(int address, int page)
         {
             QString funcName;
 
-            if (op->getArgsString().isEmpty() && m_funcCount > 0)
+            if (op->getFormattedData().isEmpty() && m_funcCount > 0)
             {
                 funcName = "func_" + QString::number(m_funcCount).rightJustified(5, '0');
             }
@@ -251,7 +251,7 @@ void Script::readPage(int address, int page)
             }
             else
             {
-                funcName = op->getArgsString();
+                funcName = op->getFormattedData();
             }
 
             if (m_funcNames.count(op->getLocation()) == 0)

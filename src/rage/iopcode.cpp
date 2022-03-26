@@ -20,12 +20,12 @@ QString IOpcode::getFormattedLocation()
     return page + ":" + loc;
 }
 
-QString IOpcode::getDataString()
+QString IOpcode::getFormattedBytes()
 {
     return QString::number(getOp()) + getData().toHex().toUpper();
 }
 
-QString IOpcode::getArgsString()
+QString IOpcode::getFormattedData()
 {
     return getData().toHex().toUpper();
 }

@@ -65,8 +65,8 @@ public:
     virtual void setPage(int page) { m_page = page; }
 
     virtual QString getFormattedLocation(); // page:offset
-    virtual QString getDataString();        // formatted raw data
-    virtual QString getArgsString();        // formatted arguments of op
+    virtual QString getFormattedBytes();    // raw data
+    virtual QString getFormattedData();     // arguments of op
 
 protected:
     QByteArray m_data;

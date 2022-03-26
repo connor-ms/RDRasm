@@ -25,13 +25,13 @@ void Op_Enter::read(QDataStream *stream)
     m_size = 4 + b;
 }
 
-QString Op_Enter::getDataString()
+QString Op_Enter::getFormattedBytes()
 {
     // ignore func name in data string
     return getData().remove(4, getData().size()).toHex().toUpper();
 }
 
-QString Op_Enter::getArgsString()
+QString Op_Enter::getFormattedData()
 {
     // only return func name
     return getData().remove(0, 4);

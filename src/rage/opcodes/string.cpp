@@ -28,13 +28,13 @@ void Op_SPush::read(QDataStream *stream)
     m_size = 2 + b;
 }
 
-QString Op_SPush::getDataString()
+QString Op_SPush::getFormattedBytes()
 {
     // ignore string in data array
     return QString::number(getOp()) + QString::number(getData()[0], 16).toUpper();
 }
 
-QString Op_SPush::getArgsString()
+QString Op_SPush::getFormattedData()
 {
     // only return string
     return "\"" + QString(getData().remove(0, 1)) + "\"";

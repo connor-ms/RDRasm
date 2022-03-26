@@ -53,8 +53,8 @@ class Op_Enter : public IOpcode, public RegisteredInFactory<Op_Enter>
     REGISTER(Op_Enter, EOpcodes::OP_ENTER, "enter")
 public:
     virtual void read(QDataStream *stream) override;
-    virtual QString getDataString() override;
-    virtual QString getArgsString() override;
+    virtual QString getFormattedBytes() override;
+    virtual QString getFormattedData() override;
 };
 
 #endif // METHODS_H

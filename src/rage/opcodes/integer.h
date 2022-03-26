@@ -34,9 +34,12 @@ MAKE_SIMPLE_OP(Op_Push4,    EOpcodes::OP_PUSH4,    "push4",    1);
 MAKE_SIMPLE_OP(Op_Push5,    EOpcodes::OP_PUSH5,    "push5",    1);
 MAKE_SIMPLE_OP(Op_Push6,    EOpcodes::OP_PUSH6,    "push6",    1);
 MAKE_SIMPLE_OP(Op_Push7,    EOpcodes::OP_PUSH7,    "push7",    1);
-MAKE_SIMPLE_OP(Op_IPush,    EOpcodes::OP_IPUSH,    "ipush",    5);
 
-// Push byte val to stack
+MAKE_SIMPLE_OP(Op_IPush2,   EOpcodes::OP_IPUSH2,   "ipush2",   3); // push next 2 bytes
+MAKE_SIMPLE_OP(Op_IPush3,   EOpcodes::OP_IPUSH3,   "ipush3",   4); // push next 3 bytes
+MAKE_SIMPLE_OP(Op_IPush,    EOpcodes::OP_IPUSH,    "ipush",    5); // push next 4 bytes
+
+// Push x bytes to stack
 MAKE_SIMPLE_OP(Op_Push1B, EOpcodes::OP_PUSH1B, "push1b", 2);
 MAKE_SIMPLE_OP(Op_Push2B, EOpcodes::OP_PUSH2B, "push2b", 3);
 MAKE_SIMPLE_OP(Op_Push3B, EOpcodes::OP_PUSH3B, "push3b", 4);
@@ -46,8 +49,5 @@ MAKE_SIMPLE_OP(Op_IAddImm1, EOpcodes::OP_IADDIMM1, "iaddimm1", 2);
 MAKE_SIMPLE_OP(Op_IAddImm2, EOpcodes::OP_IADDIMM2, "iaddimm2", 3);
 MAKE_SIMPLE_OP(Op_IMulImm1, EOpcodes::OP_IMULIMM1, "imulimm1", 2);
 MAKE_SIMPLE_OP(Op_IMulImm2, EOpcodes::OP_IMULIMM2, "imulimm1", 3);
-
-MAKE_SIMPLE_OP(Op_IPush2, EOpcodes::OP_IPUSH2, "ipush2", 3);
-MAKE_SIMPLE_OP(Op_IPush3, EOpcodes::OP_IPUSH3, "ipush3", 4);
 
 #endif // INTEGER_H

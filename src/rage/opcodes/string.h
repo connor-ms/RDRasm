@@ -14,8 +14,8 @@ class Op_SPush : public IOpcode, public RegisteredInFactory<Op_SPush>
     REGISTER(Op_SPush, EOpcodes::OP_SPUSH, "spush")
 public:
     virtual void read(QDataStream *stream) override;
-    virtual QString getDataString() override;
-    virtual QString getArgsString() override;
+    virtual QString getFormattedBytes() override;
+    virtual QString getFormattedData() override;
 };
 
 class Op_SPushL : public IOpcode, public RegisteredInFactory<Op_SPushL>

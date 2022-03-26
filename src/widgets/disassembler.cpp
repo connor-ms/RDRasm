@@ -26,6 +26,7 @@ Disassembler::Disassembler(QString file, QWidget *parent)
 
     fillDisassembly();
     createStringsTab();
+    createNativeTab();
     createScriptDataTab();
 
     connect(m_ui->actionExportDisassembly, SIGNAL(triggered()), this, SLOT(exportDisassembly()));
@@ -143,6 +144,27 @@ void Disassembler::createScriptDataTab()
     scriptData->append(getScriptHeaderData());
 }
 
+void Disassembler::createNativeTab()
+{
+    QTableWidget *natives = new QTableWidget(this);
+
+    natives->insertColumn(0);
+    natives->setHorizontalHeaderLabels({ "Natives" });
+    natives->horizontalHeader()->setStretchLastSection(true);
+
+    natives->verticalHeader()->setVisible(false);
+
+    for (auto native : m_script.getNatives())
+    {
+        int index = natives->rowCount();
+        natives->insertRow(index);
+
+        natives->setItem(index, 0, new QTableWidgetItem(Util::getNative(native, m_nativeMap)));
+    }
+
+    m_ui->tabWidget->addTab(natives, "Natives");
+}
+
 QString Disassembler::getResourceHeaderData()
 {
     QString resourceData;
@@ -196,7 +218,7 @@ QTableWidget *Disassembler::createStringsTab()
         auto op = m_script.getStrings()[i];
 
         stringTable->setItem(i, 0, new QTableWidgetItem(op->getFormattedLocation()));
-        stringTable->setItem(i, 1, new QTableWidgetItem(op->getArgsString()));
+        stringTable->setItem(i, 1, new QTableWidgetItem(op->getFormattedData()));
     }
 
     m_ui->tabWidget->addTab(stringTable, "Strings");
@@ -214,9 +236,9 @@ void Disassembler::fillDisassembly()
             continue;
 
         QTableWidgetItem *address = new QTableWidgetItem(op->getFormattedLocation());
-        QTableWidgetItem *bytes   = new QTableWidgetItem(op->getDataString());
+        QTableWidgetItem *bytes   = new QTableWidgetItem(op->getFormattedBytes());
         QTableWidgetItem *opcode  = new QTableWidgetItem(op->getName());
-        QTableWidgetItem *data    = new QTableWidgetItem(op->getArgsString());
+        QTableWidgetItem *data    = new QTableWidgetItem(op->getFormattedData());
 
         QColor funcCol(0, 12, 140);
         QFont funcFont("Roboto Mono Bold", 10);

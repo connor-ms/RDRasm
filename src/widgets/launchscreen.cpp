@@ -3,16 +3,23 @@
 
 #include <QDesktopServices>
 #include <QFileDialog>
+#include <QMessageBox>
 
 #include "disassembler.h"
 
 #include "../rage/opcodefactory.h"
+#include "../util/util.h"
 
 LaunchScreen::LaunchScreen(QWidget *parent) :
     QMainWindow(parent),
     m_ui(new Ui::LaunchScreen)
 {
     m_ui->setupUi(this);
+
+    if (Util::getAESKey() == QByteArray())
+    {
+        m_ui->btnOpenFile->setEnabled(false);
+    }
 
     connect(m_ui->btnOpenFile, SIGNAL(clicked()), this, SLOT(openFilePressed()));
     connect(m_ui->btnGithub,   SIGNAL(clicked()), this, SLOT(githubPressed()));

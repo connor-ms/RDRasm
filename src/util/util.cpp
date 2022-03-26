@@ -8,11 +8,11 @@
 
 QByteArray Util::getAESKey()
 {
-    QFile key("C:\\users\\csull\\Desktop\\rdr_key.bin");
+    QFile key("rdr_key.bin");
 
     if (!key.open(QIODevice::ReadOnly))
     {
-        QMessageBox::critical(nullptr, "Error", "Error: unable to retrieve AES key. Make sure 'key.bin' exists in the root directory.");
+        QMessageBox::critical(nullptr, "Error", "Error: Unable to retrieve AES key. Make sure 'key.bin' exists in the root directory.");
         return QByteArray();
     }
 

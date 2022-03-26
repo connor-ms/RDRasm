@@ -34,6 +34,8 @@ private:
     void createScriptDataTab();
     QTableWidget *createStringsTab();
 
+    void createNativeTab();
+
     QString getResourceHeaderData();
     QString getScriptHeaderData();
 
