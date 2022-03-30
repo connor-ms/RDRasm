@@ -89,12 +89,12 @@ bool Script::readRSCHeader()
 
 void Script::extractData()
 {
+    m_footer = m_data.mid(m_data.size() - (m_data.size() % 16));
+
     if (m_header.version == 2)
     {
         // remove header
         m_data = m_data.remove(0, 16);
-
-        int oldsize = m_data.size();
 
         // pad to nearest 16 bytes for AES to be able to decrypt
         m_data.resize(m_data.size() + (16 - (m_data.size() % 16)));
@@ -105,8 +105,11 @@ void Script::extractData()
         }
 
         // remove padding
-        m_data.remove(oldsize, m_data.size());
         m_data.remove(0, 8);
+        m_data.remove(m_data.size() - 16, 16);
+
+        // append footer for decompression
+        m_data.append(m_footer);
 
         int outsize = m_header.getSizeP() + m_header.getSizeV();
 

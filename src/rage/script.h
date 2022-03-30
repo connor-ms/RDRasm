@@ -83,6 +83,7 @@ private:
 
     // Resource data
     ResourceHeader m_header;
+    QByteArray     m_footer;
 
     // Script data
     ScriptHeader m_scriptHeader;
