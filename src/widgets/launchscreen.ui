@@ -76,7 +76,7 @@
     </rect>
    </property>
    <property name="text">
-    <string>Github</string>
+    <string>GitHub</string>
    </property>
   </widget>
   <widget class="QPushButton" name="btnExit">

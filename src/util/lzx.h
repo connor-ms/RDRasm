@@ -48,11 +48,7 @@ extern "C" {
     int lzxReset(struct LZXstate *pState);
 
     /* decompress an LZX compressed block */
-    int lzxDecompress(struct LZXstate *pState,
-        unsigned char *inPos,
-        unsigned char *outPos,
-        int inLen,
-        int outLen);
+    int lzxDecompress(struct LZXstate *pState, unsigned char *inPos, unsigned char *outPos, int inLen, int outLen);
 
 #ifdef __cplusplus
 }
