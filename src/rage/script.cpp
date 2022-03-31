@@ -5,6 +5,7 @@
 
 #include "../rage/opcodefactory.h"
 #include "../util/util.h"
+#include "../util/xcompress.h"
 #include "../../lib/Qt-AES/qaesencryption.h"
 
 #define ReadVar(x) stream >> x;
@@ -279,4 +280,77 @@ void Script::readPage(int address, int page)
 
         m_opcodes.push_back(op);
     }
+}
+
+void Script::rebuild()
+{
+    for (unsigned int page = 0; page < getPageOffsets().size(); page++)
+    {
+        unsigned int pos = getPageLocations()[page];
+        unsigned int length = (page == (unsigned int)m_scriptHeader.codePagesSize - 1) ? m_scriptHeader.codeSize % 0x4000 : 0x4000;
+
+        // clear current page
+        memset(m_data.data() + pos, 0, length);
+
+        std::list<std::shared_ptr<IOpcode>>::iterator itr = m_opcodes.begin();
+
+        while (pos < getPageLocations()[page] + length)
+        {
+            if (itr == m_opcodes.end())
+                break;
+
+            std::shared_ptr<IOpcode> op = *itr;
+
+            int size = op->getData().size() + 1;
+
+            memcpy(m_data.data() + pos, op->getFullData().data(), size);
+
+            pos += size;
+            std::advance(itr, 1);
+        }
+    }
+}
+
+QByteArray Script::compress(QByteArray data)
+{
+    QByteArray compressedData;
+    xCompress compression;
+    int compressedLen = 0;
+
+    compressedData.resize(m_data.size() + 8);
+
+    compression.xCompressInit();
+    compression.Compress(reinterpret_cast<unsigned char*>(data.data()), data.size(), (uint8_t*)compressedData.data() + 8, (int32_t*)&compressedLen);
+
+    compressedData.remove(0, 4);
+
+    QDataStream str(&compressedData, QIODevice::WriteOnly);
+    str << compressedLen;
+
+    compressedData.prepend("\x0F\xF5\x12\xF1"); // lzx header?
+
+    compressedData.resize(compressedLen);
+
+    return compressedData;
+}
+
+QByteArray Script::encrypt(QByteArray data)
+{
+    QByteArray encrypted(data);
+
+    for (int i = 0; i < 0x10; i++)
+    {
+        encrypted = QAESEncryption::Crypt(QAESEncryption::Aes::AES_256, QAESEncryption::Mode::ECB, encrypted, Util::getAESKey(), QByteArray(), QAESEncryption::ZERO);
+    }
+
+    encrypted.append(m_footer);
+
+    QDataStream stream(&encrypted, QIODevice::WriteOnly);
+
+    stream << m_header.magic;
+    stream << m_header.version;
+    stream << m_header.flags1;
+    stream << m_header.flags2;
+
+    return encrypted;
 }

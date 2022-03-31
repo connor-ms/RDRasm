@@ -68,6 +68,8 @@ public:
     virtual QString getFormattedBytes();    // raw data
     virtual QString getFormattedData();     // arguments of op
 
+    virtual QByteArray getFullData();
+
 protected:
     QByteArray m_data;
     unsigned int m_location;

@@ -15,14 +15,7 @@ void Op_SPush::read(QDataStream *stream)
         byte stringByte;
         *stream >> stringByte;
 
-        if (stringByte == 0x0A)
-        {
-            m_data.push_back("\\n");
-        }
-        else
-        {
-            m_data.push_back(stringByte);
-        }
+        m_data.push_back(stringByte);
     }
 
     m_size = 2 + b;
@@ -37,7 +30,11 @@ QString Op_SPush::getFormattedBytes()
 QString Op_SPush::getFormattedData()
 {
     // only return string
-    return "\"" + QString(getData().remove(0, 1)) + "\"";
+    QString result(getData());
+
+    result.replace(0x0A, "\\n");
+
+    return "\"" + QString(result.remove(0, 1)) + "\"";
 }
 
 void Op_SPushL::read(QDataStream *stream)

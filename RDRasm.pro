@@ -20,6 +20,7 @@ SOURCES += \
     src/rage/script.cpp \
     src/util/lzx.c \
     src/util/util.cpp \
+    src/util/xcompress.cpp \
     src/widgets/disassembler.cpp \
     src/widgets/launchscreen.cpp \
     src/widgets/opcodetable.cpp
@@ -38,6 +39,7 @@ HEADERS += \
     src/rage/script.h \
     src/util/lzx.h \
     src/util/util.h \
+    src/util/xcompress.h \
     src/widgets/disassembler.h \
     src/widgets/launchscreen.h \
     src/widgets/opcodetable.h

@@ -64,3 +64,10 @@ QString IOpcode::getFormattedData()
 
     return getData().toHex().toUpper();
 }
+
+QByteArray IOpcode::getFullData()
+{
+    QByteArray data(m_data);
+    data.prepend(getOp());
+    return data;
+}

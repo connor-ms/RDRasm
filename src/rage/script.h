@@ -67,6 +67,15 @@ public:
 
     unsigned int getPageByLocation(unsigned int location);
 
+    /*--=-----------*
+     *  Rebuilding  *
+     *--------------*/
+
+    void rebuild();
+
+    QByteArray encrypt(QByteArray data);
+    QByteArray compress(QByteArray data);
+
 private:
     // Extract script from RSC container
     bool readRSCHeader();
