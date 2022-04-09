@@ -62,6 +62,22 @@ QString IOpcode::getFormattedData()
         return result;
     }
 
+    if (getOp() == EOpcodes::OP_PUSH2B || getOp() == EOpcodes::OP_PUSH3B)
+    {
+        QString result;
+        QByteArray data = getData().toHex();
+
+        for (int i = 0; i < data.length(); i++)
+        {
+            result += data[i];
+
+            if (i % 2 == 1)
+                result += " ";
+        }
+
+        return result;
+    }
+
     return getData().toHex().toUpper();
 }
 

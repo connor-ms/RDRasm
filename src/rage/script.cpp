@@ -317,7 +317,7 @@ QByteArray Script::compress(QByteArray data)
     xCompress compression;
     int compressedLen = 0;
 
-    compressedData.resize(m_data.size() + 8);
+    compressedData.resize(data.size() + 8);
 
     compression.xCompressInit();
     compression.Compress(reinterpret_cast<unsigned char*>(data.data()), data.size(), (uint8_t*)compressedData.data() + 8, (int32_t*)&compressedLen);
@@ -328,6 +328,8 @@ QByteArray Script::compress(QByteArray data)
     str << compressedLen;
 
     compressedData.prepend("\x0F\xF5\x12\xF1"); // lzx header?
+
+    compressedLen += 8;
 
     compressedData.resize(compressedLen);
 
@@ -345,12 +347,15 @@ QByteArray Script::encrypt(QByteArray data)
 
     encrypted.append(m_footer);
 
-    QDataStream stream(&encrypted, QIODevice::WriteOnly);
+    QByteArray header;
+    QDataStream stream(&header, QIODevice::WriteOnly);
 
     stream << m_header.magic;
     stream << m_header.version;
     stream << m_header.flags1;
     stream << m_header.flags2;
+
+    encrypted.prepend(header);
 
     return encrypted;
 }
