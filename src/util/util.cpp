@@ -8,7 +8,7 @@
 
 QByteArray Util::getAESKey()
 {
-    QFile key("rdr_key.bin");
+    QFile key("C:\\users\\csull\\Desktop\\rdr_key.bin");
 
     if (!key.open(QIODevice::ReadOnly))
     {
@@ -124,6 +124,7 @@ QMap<unsigned int, QString> Util::getNatives()
     if (natives.open(QIODevice::ReadOnly))
     {
         QTextStream in(&natives);
+
         while (!in.atEnd())
         {
             QString line = in.readLine();
@@ -138,6 +139,29 @@ QMap<unsigned int, QString> Util::getNatives()
     else
     {
         QMessageBox::critical(0, "Error", "Error: Failed to read natives. Only hashes will be available.");
+    }
+
+    QFile customNatives(":/res/rage/custom-natives.txt");
+
+    if (customNatives.open(QIODevice::ReadOnly))
+    {
+        QTextStream in(&customNatives);
+
+        while (!in.atEnd())
+        {
+            QString line = in.readLine();
+
+            uint hash = line.split(" : ").at(0).toUInt();
+            QString native = line.split(" : ").at(1);
+
+            nativeMap.insert(hash, native);
+        }
+
+        customNatives.close();
+    }
+    else
+    {
+        QMessageBox::critical(0, "Error", "Error: Failed to read custom natives. Only hashes will be available.");
     }
 
     return nativeMap;

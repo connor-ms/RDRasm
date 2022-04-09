@@ -2,10 +2,10 @@
     <qresource prefix="/res">
         <file>rage/natives.txt</file>
         <file>rage/opcodes.json</file>
-        <file>rage/customNatives.txt</file>
         <file>light.qss</file>
         <file>fonts/RobotoMono-Bold.ttf</file>
         <file>fonts/RobotoMono-Regular.ttf</file>
         <file>icon.ico</file>
+        <file>rage/custom-natives.txt</file>
     </qresource>
 </RCC>
