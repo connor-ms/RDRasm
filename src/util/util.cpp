@@ -8,7 +8,7 @@
 
 QByteArray Util::getAESKey()
 {
-    QFile key("C:\\users\\csull\\Desktop\\rdr_key.bin");
+    QFile key("rdr_key.bin");
 
     if (!key.open(QIODevice::ReadOnly))
     {
