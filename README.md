@@ -6,14 +6,8 @@ Disassembler for Red Dead Redemption scripts.
 # Download
 For the latest download, navigate to the releases tab, or click [here](https://github.com/connorms/RDRasm/releases).
 
-# Features
-- PS3 (.csc) disassembling
-- Xbox 360 (.xsc) disassembling
-- Exporting raw data
-- Exporting disassembly
-
 # Usage
-I've provided a simple example script that is intended to be used to see how the program works, without needing to extract a script from the game. I've provided the source code of that script as well, to be able to compare the disassembly with the source code of the script.
+Currently, this can only open Xbox 360 versions of scripts (*.xsc). I've provided a simple example script that is intended to be used to see how the program works, without needing to extract a script from the game. I've provided the source code of that script as well, to be able to compare the disassembly with the source code of the script.
 
 **IMPORTANT NOTE:** For the program to work, you will need to provide RDR's AES key, and put it in a file named `rdr_key.bin` in the root folder of the exe. Without this, it's not possible to decrypt compiled scripts. It can be found in any other RDR tool used to open RPFs, I just can't provide it due to copyright stuff.
 
