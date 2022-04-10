@@ -40,6 +40,8 @@ HEADERS += \
     src/util/lzx.h \
     src/util/util.h \
     src/util/xcompress.h \
+    src/util/zconf.h \
+    src/util/zlib.h \
     src/widgets/disassembler.h \
     src/widgets/launchscreen.h \
     src/widgets/opcodetable.h
@@ -59,3 +61,8 @@ RESOURCES += \
     res/res.qrc
 
 RC_ICONS = res/icon.ico
+
+unix|win32: LIBS += -L$$PWD/lib/ -lzlib
+
+INCLUDEPATH += $$PWD/.
+DEPENDPATH += $$PWD/.

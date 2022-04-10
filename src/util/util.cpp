@@ -4,7 +4,12 @@
 #include <QMessageBox>
 #include <QTextStream>
 
+#include "../../lib/Qt-AES/qaesencryption.h"
+
 #include "lzx.h"
+#include "zlib.h"
+
+#define CHUNK 16384
 
 QByteArray Util::getAESKey()
 {
@@ -19,43 +24,73 @@ QByteArray Util::getAESKey()
     return key.readAll();
 }
 
+QByteArray Util::decrypt(QByteArray in)
+{
+    QByteArray result(in);
 
-void Util::decompressBuffer(unsigned char *in, unsigned char *out, int outsize)
+    //int oldSize = result.size();
+
+    // pad to nearest 16 bytes for AES to be able to decrypt
+    result.resize(result.size() + (16 - (result.size() % 16)));
+
+    for (int i = 0; i < 0x10; i++)
+    {
+        result = QAESEncryption::Decrypt(QAESEncryption::Aes::AES_256, QAESEncryption::Mode::ECB, result, Util::getAESKey(), QByteArray(), QAESEncryption::ZERO);
+    }
+
+    //result.resize(oldSize);
+
+    return result;
+}
+
+QByteArray Util::encrypt(QByteArray in)
+{
+    QByteArray result(in);
+
+    for (int i = 0; i < 0x10; i++)
+    {
+        result = QAESEncryption::Crypt(QAESEncryption::Aes::AES_256, QAESEncryption::Mode::ECB, result, Util::getAESKey(), QByteArray(), QAESEncryption::ZERO);
+    }
+
+    return result;
+}
+
+void Util::lzxDecompress(std::vector<uint8_t> &in, std::vector<uint8_t> &out)
 {
     struct LZXstate *lzx_state = lzxInit(17);
 
-    int outputSize = 0;
+    unsigned int outputSize = 0;
 
     int offset = 0;
 
-    while (outputSize != outsize)
+    while (outputSize != out.size())
     {
         int tmpoutputSize = 0;
         int tmpinputSize = 0;
 
-        if (*(unsigned char *)(in + offset) == 0xff)
+        if (*(unsigned char *)(&in[0] + offset) == 0xff)
         {
-            tmpoutputSize = *(unsigned char *)(in + offset + 1) << 8;
-            tmpoutputSize |= *(unsigned char *)(in + offset + 2);
-            tmpinputSize = *(unsigned char *)(in + offset + 3) << 8;
-            tmpinputSize |= *(unsigned char *)(in + offset + 4);
+            tmpoutputSize  = *(unsigned char *)(&in[0] + offset + 1) << 8;
+            tmpoutputSize |= *(unsigned char *)(&in[0] + offset + 2);
+            tmpinputSize   = *(unsigned char *)(&in[0] + offset + 3) << 8;
+            tmpinputSize  |= *(unsigned char *)(&in[0] + offset + 4);
 
             offset += 5;
         }
         else
         {
             tmpoutputSize = 0x8000;
-            tmpinputSize = (*(unsigned char *)(in + offset) << 8) | *(unsigned char *)(in + offset + 1);
+            tmpinputSize = (*(unsigned char *)(&in[0] + offset) << 8) | *(unsigned char *)(&in[0] + offset + 1);
             if (tmpinputSize == 0)
                 break;
             offset += 2;
         }
 
-        int res = lzxDecompress(lzx_state, in + offset, out + outputSize, tmpinputSize, tmpoutputSize);
+        int res = ::lzxDecompress(lzx_state, &in[0] + offset, &out[0] + outputSize, tmpinputSize, tmpoutputSize);
+
         if (res != 0)
         {
             QMessageBox::critical(0, "Error", QString("Error: LZX decompression failed! (Error code: %1)").arg(res));
-            memset(out, 0, outsize);
             break;
         }
 
@@ -64,6 +99,125 @@ void Util::decompressBuffer(unsigned char *in, unsigned char *out, int outsize)
     }
 
     lzxTeardown(lzx_state);
+}
+
+void Util::zlibDecompress(const std::vector<uint8_t>& in, std::vector<uint8_t> &out)
+{
+    z_stream infstream;
+
+    infstream.zalloc = Z_NULL;
+    infstream.zfree  = Z_NULL;
+    infstream.opaque = Z_NULL;
+
+    infstream.avail_in  = (uInt)in.size();
+    infstream.next_in   = (Bytef *)&in[0];
+    infstream.avail_out = (uInt)out.size();
+    infstream.next_out  = (Bytef *)&out[0];
+
+    inflateInit(&infstream);
+    inflate(&infstream, Z_NO_FLUSH);
+    inflateEnd(&infstream);
+}
+
+void Util::zlibCompress(const std::vector<uint8_t>& in, std::vector<uint8_t> &out)
+{
+    int32_t ec, flush;
+    uint32_t have;
+    z_stream strm;
+
+    uint8_t inbuf[CHUNK];
+    uint8_t outbuf[CHUNK];
+
+    uint32_t inIndex    = 0;
+    uint32_t inIndexOld = 0;
+
+    out.clear();
+
+    // allocate deflate state
+    strm.zalloc = Z_NULL;
+    strm.zfree  = Z_NULL;
+    strm.opaque = Z_NULL;
+
+    ec = deflateInit(&strm, Z_BEST_COMPRESSION);
+
+    if (ec != Z_OK)
+    {
+        QMessageBox::critical(nullptr, "ZLib Error", QString("ZLib compression error. (%1)").arg(zlibErrorCodeToStr(ec).c_str()));
+        return;
+    }
+
+    // compress until end of file
+    do
+    {
+        inIndexOld = inIndex;
+        inIndex += CHUNK;
+
+        if (inIndex > in.size())
+        {
+            inIndex = in.size();
+            flush = Z_FINISH;
+        }
+        else
+            flush = Z_NO_FLUSH;
+
+        uint32_t size = inIndex - inIndexOld;
+        memcpy(inbuf, in.data() + inIndexOld, size);
+
+        strm.avail_in = size;
+        strm.next_in  = inbuf;
+
+        do
+        {
+            strm.avail_out = CHUNK;
+            strm.next_out  = outbuf;
+
+            ec = deflate(&strm, flush);
+
+            if (ec == Z_STREAM_ERROR)
+            {
+                QMessageBox::critical(nullptr, "ZLib Error", QString("ZLib compression error. (%1)").arg(zlibErrorCodeToStr(ec).c_str()));
+                return;
+            }
+
+            have = CHUNK - strm.avail_out;
+
+            out.insert(out.end(), outbuf, outbuf + have);
+
+        } while (strm.avail_out == 0);
+
+        assert(strm.avail_in == 0);
+
+    } while (flush != Z_FINISH);
+
+    if (ec != Z_STREAM_END)
+    {
+        QMessageBox::critical(nullptr, "ZLib Error", QString("ZLib compression error. (%1)").arg(zlibErrorCodeToStr(ec).c_str()));
+    }
+
+    ec = deflateEnd(&strm);
+
+    if (ec != Z_OK)
+    {
+        QMessageBox::critical(nullptr, "ZLib Error", QString("ZLib compression error. (%1)").arg(zlibErrorCodeToStr(ec).c_str()));
+    }
+}
+
+std::string Util::zlibErrorCodeToStr(int32_t errorcode)
+{
+    switch (errorcode)
+    {
+        case Z_OK:            return "Z_OK";
+        case Z_STREAM_END:    return "Z_STREAM_END";
+        case Z_NEED_DICT:     return "Z_NEED_DICT";
+        case Z_ERRNO:         return "Z_ERRNO";
+        case Z_STREAM_ERROR:  return "Z_STREAM_ERROR";
+        case Z_DATA_ERROR:    return "Z_DATA_ERROR";
+        case Z_MEM_ERROR:     return "Z_MEM_ERROR";
+        case Z_BUF_ERROR:     return "Z_BUF_ERROR";
+        case Z_VERSION_ERROR: return "Z_VERSION_ERROR";
+    }
+
+    return "UNK_ERR" + QString::number(errorcode).toStdString();
 }
 
 unsigned int Util::hash(std::string str, bool lowercase)

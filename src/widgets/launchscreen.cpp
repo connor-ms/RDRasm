@@ -33,7 +33,7 @@ LaunchScreen::~LaunchScreen()
 
 void LaunchScreen::openFilePressed()
 {
-    QString file = QFileDialog::getOpenFileName(this, "Select a file", "", "Script (*.xsc)");
+    QString file = QFileDialog::getOpenFileName(this, "Select a file", "", "Script (*.xsc *.csc)");
 
     if (!file.isEmpty())
     {

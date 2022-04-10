@@ -44,10 +44,18 @@ struct ScriptHeader
     int headerPos;
 };
 
+enum ScriptType
+{
+    TYPE_X360,
+    TYPE_PS3
+};
+
 class Script
 {
 public:
     Script(QString path);
+
+    ScriptType getScriptType() { return m_scriptType; }
 
     QByteArray getData() { return m_data; };
 
@@ -112,6 +120,7 @@ private:
     // General data
     QByteArray m_data;
     QFile m_script;
+    ScriptType m_scriptType;
 };
 
 #endif // SCRIPT_H

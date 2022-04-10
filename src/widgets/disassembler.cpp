@@ -47,7 +47,7 @@ Disassembler::~Disassembler()
 
 void Disassembler::exportDisassembly()
 {
-    QString filePath = QFileDialog::getSaveFileName(this, "Export disassembly", m_file.split("\\").last().split(".xsc").first(), "Text (*.txt)");
+    QString filePath = QFileDialog::getSaveFileName(this, "Export disassembly", m_file.split("\\").last(), "Text (*.txt)");
 
     if (filePath.isEmpty())
     {
@@ -90,7 +90,7 @@ void Disassembler::exportDisassembly()
 
 void Disassembler::exportRawData()
 {
-    QString filePath = QFileDialog::getSaveFileName(this, "Export raw data", m_file.split("\\").last().split(".xsc").first(), "Binary data (*.bin)");
+    QString filePath = QFileDialog::getSaveFileName(this, "Export raw data", m_file.split("\\").last(), "Binary data (*.bin)");
 
     if (filePath.isEmpty())
     {

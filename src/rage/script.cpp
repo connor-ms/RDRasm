@@ -6,7 +6,6 @@
 #include "../rage/opcodefactory.h"
 #include "../util/util.h"
 #include "../util/xcompress.h"
-#include "../../lib/Qt-AES/qaesencryption.h"
 
 #define ReadVar(x) stream >> x;
 #define ReadPointer(x) stream >> x; x = x & 0xffffff;
@@ -28,6 +27,11 @@ Script::Script(QString path)
     msgBox.setText("Error: Unable to read script. May be due to decompression issues, so if you're sure it's a valid script retrying may fix it.");
 
     m_scriptHeader.headerPos = -1;
+
+    if (path.contains(".csc"))
+        m_scriptType = ScriptType::TYPE_PS3;
+    else
+        m_scriptType = ScriptType::TYPE_X360;
 
     do
     {
@@ -71,7 +75,7 @@ bool Script::readRSCHeader()
 
     stream >> m_header.magic;
 
-    if (m_header.magic != 0x85435352)
+    if (m_header.magic != 0x85435352 && m_header.magic != 0x86435352)
     {
         return false;
     }
@@ -80,9 +84,9 @@ bool Script::readRSCHeader()
     stream >> m_header.flags1;
     stream >> m_header.flags2;
 
-    m_header.vSize = (int)(m_header.flags2 & 0x7FFF);
-    m_header.pSize = (int)((m_header.flags2 & 0xFFF7000) >> 14);
-    m_header._f14_30 = (int)(m_header.flags2 & 0x70000000);
+    m_header.vSize    = (int)(m_header.flags2 & 0x7FFF);
+    m_header.pSize    = (int)((m_header.flags2 & 0xFFF7000) >> 14);
+    m_header._f14_30  = (int)(m_header.flags2 & 0x70000000);
     m_header.extended = (m_header.flags2 & 0x80000000) == 0x80000000 ? true : false;
 
     return true;
@@ -97,29 +101,30 @@ void Script::extractData()
         // remove header
         m_data = m_data.remove(0, 16);
 
-        // pad to nearest 16 bytes for AES to be able to decrypt
-        m_data.resize(m_data.size() + (16 - (m_data.size() % 16)));
-
-        for (int i = 0; i < 0x10; i++)
-        {
-            m_data = QAESEncryption::Decrypt(QAESEncryption::Aes::AES_256, QAESEncryption::Mode::ECB, m_data, Util::getAESKey(), QByteArray(), QAESEncryption::ZERO);
-        }
-
-        // remove padding
-        m_data.remove(0, 8);
-        m_data.remove(m_data.size() - 16, 16);
-
-        // append footer for decompression
-        m_data.append(m_footer);
+        m_data = Util::decrypt(m_data);
 
         int outsize = m_header.getSizeP() + m_header.getSizeV();
 
-        unsigned char *in  = reinterpret_cast<unsigned char *>(m_data.data());
-        unsigned char *out = new unsigned char[outsize];
+        std::vector<uint8_t> in(m_data.begin(), m_data.end());
+        std::vector<uint8_t> out(outsize);
 
-        Util::decompressBuffer(in, out, outsize);
+        if (m_scriptType == ScriptType::TYPE_X360)
+        {
+            // remove padding
+            in.erase(in.begin(), in.begin() + 8);
+            in.erase(in.end() - 16, in.end());
 
-        m_data = QByteArray::fromRawData(reinterpret_cast<char *>(out), outsize);
+            // append lzx footer
+            in.insert(in.end(), m_footer.begin(), m_footer.end());
+
+            Util::lzxDecompress(in, out);
+        }
+        else
+        {
+            Util::zlibDecompress(in, out);
+        }
+
+        m_data = QByteArray(reinterpret_cast<const char*>(out.data()), outsize);
     }
 }
 
@@ -338,12 +343,7 @@ QByteArray Script::compress(QByteArray data)
 
 QByteArray Script::encrypt(QByteArray data)
 {
-    QByteArray encrypted(data);
-
-    for (int i = 0; i < 0x10; i++)
-    {
-        encrypted = QAESEncryption::Crypt(QAESEncryption::Aes::AES_256, QAESEncryption::Mode::ECB, encrypted, Util::getAESKey(), QByteArray(), QAESEncryption::ZERO);
-    }
+    QByteArray encrypted = Util::encrypt(data);
 
     encrypted.append(m_footer);
 
