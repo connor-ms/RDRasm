@@ -4,8 +4,6 @@
 #include <QMessageBox>
 #include <QTextStream>
 
-#include "../../lib/Qt-AES/qaesencryption.h"
-
 #include "crypto/aes256.h"
 #include "crypto/lzx.h"
 #include "crypto/xcompress.h"

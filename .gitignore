@@ -31,7 +31,8 @@
 *.a
 *.lib
 !lib/zlib.lib
-!lib/zlib1.dll
+!bin/xcompress32.dll
+!bin/zlib1.dll
 
 # Executables
 *.exe

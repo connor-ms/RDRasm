@@ -9,7 +9,6 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-    lib/Qt-AES/qaesencryption.cpp \
     src/main.cpp \
     src/rage/iopcode.cpp \
     src/rage/opcodefactory.cpp \
@@ -27,7 +26,6 @@ SOURCES += \
     src/widgets/opcodetable.cpp
 
 HEADERS += \
-    lib/Qt-AES/qaesencryption.h \
     src/rage/iopcode.h \
     src/rage/opcodefactory.h \
     src/rage/opcodes/float.h \
