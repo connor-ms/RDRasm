@@ -18,9 +18,10 @@ SOURCES += \
     src/rage/opcodes/misc.cpp \
     src/rage/opcodes/string.cpp \
     src/rage/script.cpp \
-    src/util/lzx.c \
+    src/util/crypto/aes256.cpp \
+    src/util/crypto/lzx.c \
     src/util/util.cpp \
-    src/util/xcompress.cpp \
+    src/util/crypto/xcompress.cpp \
     src/widgets/disassembler.cpp \
     src/widgets/launchscreen.cpp \
     src/widgets/opcodetable.cpp
@@ -37,11 +38,12 @@ HEADERS += \
     src/rage/opcodes/string.h \
     src/rage/opcodes/vector.h \
     src/rage/script.h \
-    src/util/lzx.h \
+    src/util/crypto/aes256.h \
+    src/util/crypto/lzx.h \
     src/util/util.h \
-    src/util/xcompress.h \
-    src/util/zconf.h \
-    src/util/zlib.h \
+    src/util/crypto/xcompress.h \
+    src/util/crypto/zconf.h \
+    src/util/crypto/zlib.h \
     src/widgets/disassembler.h \
     src/widgets/launchscreen.h \
     src/widgets/opcodetable.h

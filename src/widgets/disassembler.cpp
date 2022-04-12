@@ -35,6 +35,9 @@ Disassembler::Disassembler(QString file, QWidget *parent)
     connect(m_ui->actionExit, SIGNAL(triggered()), this, SLOT(exit()));
     connect(m_ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
 
+    connect(m_ui->actionConvertPS3,  SIGNAL(triggered()), this, SLOT(convertPS3()));
+    connect(m_ui->actionConvertX360, SIGNAL(triggered()), this, SLOT(convertX360()));
+
     setWindowTitle("RDRasm - " + file);
 
     QApplication::setOverrideCursor(Qt::ArrowCursor);
@@ -47,7 +50,7 @@ Disassembler::~Disassembler()
 
 void Disassembler::exportDisassembly()
 {
-    QString filePath = QFileDialog::getSaveFileName(this, "Export disassembly", m_file.split("\\").last(), "Text (*.txt)");
+    QString filePath = QFileDialog::getSaveFileName(this, "Export disassembly", m_file.split("\\").last() + ".txt", "Text (*.txt)");
 
     if (filePath.isEmpty())
     {
@@ -90,7 +93,7 @@ void Disassembler::exportDisassembly()
 
 void Disassembler::exportRawData()
 {
-    QString filePath = QFileDialog::getSaveFileName(this, "Export raw data", m_file.split("\\").last(), "Binary data (*.bin)");
+    QString filePath = QFileDialog::getSaveFileName(this, "Export raw data", m_file.split("\\").last() + ".bin", "Binary data (*.bin)");
 
     if (filePath.isEmpty())
     {
@@ -119,7 +122,7 @@ void Disassembler::exit()
 
 void Disassembler::open()
 {
-    QString file = QFileDialog::getOpenFileName(this, "Select a file", "", "Script (*.xsc)");
+    QString file = QFileDialog::getOpenFileName(this, "Select a file", "", "Script (*.xsc *.csc)");
 
     if (!file.isEmpty())
     {
@@ -130,6 +133,72 @@ void Disassembler::open()
 
         close();
     }
+}
+
+void Disassembler::convertPS3()
+{
+    QString outDir = QFileDialog::getSaveFileName(this, "Convert to .csc", QString(), "Script (*.csc)");
+
+    if (outDir.isEmpty())
+        return;
+
+    QByteArray script = Util::encrypt(Util::zlibCompress(m_script.getData()));
+
+    QByteArray header;
+    QDataStream stream(&header, QIODevice::WriteOnly);
+
+    stream << 0x86435352; // csc header
+    stream << m_script.getResourceHeader().version;
+    stream << m_script.getResourceHeader().flags1;
+    stream << m_script.getResourceHeader().flags2;
+
+    script.prepend(header);
+
+    QFile out(outDir);
+
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        QMessageBox::critical(this, "Error", "Error: Unable to write to output file.");
+        return;
+    }
+
+    out.write(script);
+    out.close();
+
+    QMessageBox::information(this, "Converted script", QString("Succesfully converted script to %1.").arg(outDir));
+}
+
+void Disassembler::convertX360()
+{
+    QString outDir = QFileDialog::getSaveFileName(this, "Convert to .xsc", QString(), "Script (*.xsc)");
+
+    if (outDir.isEmpty())
+        return;
+
+    QByteArray script = Util::encrypt(Util::lzxCompress(m_script.getData()));
+
+    QByteArray header;
+    QDataStream stream(&header, QIODevice::WriteOnly);
+
+    stream << 0x85435352; // xsc header
+    stream << m_script.getResourceHeader().version;
+    stream << m_script.getResourceHeader().flags1;
+    stream << m_script.getResourceHeader().flags2;
+
+    script.prepend(header);
+
+    QFile out(outDir);
+
+    if (!out.open(QIODevice::WriteOnly | QIODevice::Truncate))
+    {
+        QMessageBox::critical(this, "Error", "Error: Unable to write to output file.");
+        return;
+    }
+
+    out.write(script);
+    out.close();
+
+    QMessageBox::information(this, "Converted script", QString("Succesfully converted script to %1.").arg(outDir));
 }
 
 void Disassembler::createScriptDataTab()

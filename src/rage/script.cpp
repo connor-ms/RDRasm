@@ -5,7 +5,6 @@
 
 #include "../rage/opcodefactory.h"
 #include "../util/util.h"
-#include "../util/xcompress.h"
 
 #define ReadVar(x) stream >> x;
 #define ReadPointer(x) stream >> x; x = x & 0xffffff;
@@ -20,12 +19,6 @@ Script::Script(QString path)
         return;
     }
 
-    QMessageBox msgBox;
-    QAbstractButton *retryButton  = (QAbstractButton*)msgBox.addButton("Retry", QMessageBox::YesRole);
-    QAbstractButton *cancelButton = (QAbstractButton*)msgBox.addButton("Cancel", QMessageBox::NoRole);
-
-    msgBox.setText("Error: Unable to read script. May be due to decompression issues, so if you're sure it's a valid script retrying may fix it.");
-
     m_scriptHeader.headerPos = -1;
 
     if (path.contains(".csc"))
@@ -33,34 +26,26 @@ Script::Script(QString path)
     else
         m_scriptType = ScriptType::TYPE_X360;
 
-    do
+    m_data = m_script.readAll();
+
+    // Decompress and unencrypt script from inside resource file
+    if (readRSCHeader() == false)
     {
-        m_data = m_script.readAll();
+        QMessageBox::critical(nullptr, "Error", "Error: Invalid script.");
 
-        // Decompress and unencrypt script from inside resource file
-        if (readRSCHeader() == false)
-        {
-            QMessageBox::critical(nullptr, "Error", "Error: Invalid script.");
-
-            return;
-        }
-
-        extractData();
-
-        // Begin disassembling script once extracted from resource file
-        m_scriptHeader.headerPos = findScriptHeader();
-
-        if (m_scriptHeader.headerPos == -1)
-        {
-            msgBox.exec();
-
-            if (msgBox.clickedButton() == cancelButton)
-            {
-                return;
-            }
-        }
+        return;
     }
-    while (m_scriptHeader.headerPos == -1 && msgBox.clickedButton() == retryButton);
+
+    extractData();
+
+    // Begin disassembling script once extracted from resource file
+    m_scriptHeader.headerPos = findScriptHeader();
+
+    if (m_scriptHeader.headerPos == -1)
+    {
+        QMessageBox::critical(nullptr, "Error", "Error: Unable to find script header.");
+        return;
+    }
 
     readScriptHeader(m_scriptHeader.headerPos);
     readNatives();
@@ -98,33 +83,24 @@ void Script::extractData()
 
     if (m_header.version == 2)
     {
-        // remove header
+        // remove rsc header
         m_data = m_data.remove(0, 16);
 
         m_data = Util::decrypt(m_data);
 
-        int outsize = m_header.getSizeP() + m_header.getSizeV();
-
-        std::vector<uint8_t> in(m_data.begin(), m_data.end());
-        std::vector<uint8_t> out(outsize);
+        int outSize = m_header.getSizeP() + m_header.getSizeV();
 
         if (m_scriptType == ScriptType::TYPE_X360)
         {
-            // remove padding
-            in.erase(in.begin(), in.begin() + 8);
-            in.erase(in.end() - 16, in.end());
+            // remove lzx header
+            m_data.remove(0, 8);
 
-            // append lzx footer
-            in.insert(in.end(), m_footer.begin(), m_footer.end());
-
-            Util::lzxDecompress(in, out);
+            m_data = Util::lzxDecompress(m_data, outSize);
         }
         else
         {
-            Util::zlibDecompress(in, out);
+            m_data = Util::zlibDecompress(m_data, outSize);
         }
-
-        m_data = QByteArray(reinterpret_cast<const char*>(out.data()), outsize);
     }
 }
 
@@ -314,48 +290,4 @@ void Script::rebuild()
             std::advance(itr, 1);
         }
     }
-}
-
-QByteArray Script::compress(QByteArray data)
-{
-    QByteArray compressedData;
-    xCompress compression;
-    int compressedLen = 0;
-
-    compressedData.resize(data.size() + 8);
-
-    compression.xCompressInit();
-    compression.Compress(reinterpret_cast<unsigned char*>(data.data()), data.size(), (uint8_t*)compressedData.data() + 8, (int32_t*)&compressedLen);
-
-    compressedData.remove(0, 4);
-
-    QDataStream str(&compressedData, QIODevice::WriteOnly);
-    str << compressedLen;
-
-    compressedData.prepend("\x0F\xF5\x12\xF1"); // lzx header?
-
-    compressedLen += 8;
-
-    compressedData.resize(compressedLen);
-
-    return compressedData;
-}
-
-QByteArray Script::encrypt(QByteArray data)
-{
-    QByteArray encrypted = Util::encrypt(data);
-
-    encrypted.append(m_footer);
-
-    QByteArray header;
-    QDataStream stream(&header, QIODevice::WriteOnly);
-
-    stream << m_header.magic;
-    stream << m_header.version;
-    stream << m_header.flags1;
-    stream << m_header.flags2;
-
-    encrypted.prepend(header);
-
-    return encrypted;
 }

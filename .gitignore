@@ -30,6 +30,8 @@
 *.la
 *.a
 *.lib
+!lib/zlib.lib
+!lib/zlib1.dll
 
 # Executables
 *.exe

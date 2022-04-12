@@ -28,6 +28,9 @@ public slots:
     void exit();
     void open();
 
+    void convertPS3();
+    void convertX360();
+
 private:
     void fillDisassembly();
 

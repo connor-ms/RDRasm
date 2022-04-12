@@ -12,11 +12,11 @@ public:
     static QByteArray decrypt(QByteArray in);
     static QByteArray encrypt(QByteArray in);
 
-    static void lzxDecompress(std::vector<uint8_t> &in, std::vector<uint8_t> &out);
-    static void lzxCompress(std::vector<uint8_t> &in, std::vector<uint8_t> &out);
+    static QByteArray lzxDecompress(QByteArray in, int outSize);
+    static QByteArray lzxCompress(QByteArray in);
 
-    static void zlibDecompress(const std::vector<uint8_t>& in, std::vector<uint8_t> &out);
-    static void zlibCompress(const std::vector<uint8_t>& in, std::vector<uint8_t> &out);
+    static QByteArray zlibDecompress(QByteArray in, int outSize);
+    static QByteArray zlibCompress(QByteArray in);
     static std::string zlibErrorCodeToStr(int32_t errorcode);
 
     static unsigned int hash(std::string str, bool lowercase = true);

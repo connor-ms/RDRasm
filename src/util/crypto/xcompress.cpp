@@ -4,7 +4,7 @@ void xCompress::xCompressInit()
 {
     if (!loaded)
     {
-        xCompressDLL = LoadLibraryA("xcompress32.dll");
+        xCompressDLL = LoadLibraryA("C:\\xcompress32.dll");
 
         if (xCompressDLL != NULL)
         {

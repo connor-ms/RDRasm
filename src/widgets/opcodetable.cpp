@@ -3,8 +3,6 @@
 #include <QHeaderView>
 #include <QMenu>
 
-#include <QDebug>
-
 OpcodeTable::OpcodeTable(int rows, int columns, QWidget *parent)
     : QTableWidget(rows, columns, parent)
 {
