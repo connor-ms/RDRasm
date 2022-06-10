@@ -44,7 +44,10 @@ enum EOpcodes
     OP_RET0R0,   OP_RET0R1, OP_RET0R2, OP_RET0R3, OP_RET1R0, OP_RET1R1, OP_RET1R2, OP_RET1R3,
     OP_RET2R0,   OP_RET2R1, OP_RET2R2, OP_RET2R3, OP_RET3R0, OP_RET3R1, OP_RET3R2, OP_RET3R3,
     OP_PUSHNEG1, OP_PUSH0,  OP_PUSH1,  OP_PUSH2,  OP_PUSH3,  OP_PUSH4,  OP_PUSH5,  OP_PUSH6,  OP_PUSH7,
-    OP_FPUSHN1,  OP_FPUSH0, OP_FPUSH1, OP_FPUSH2, OP_FPUSH3, OP_FPUSH4, OP_FPUSH5, OP_FPUSH6, OP_FPUSH7
+    OP_FPUSHN1,  OP_FPUSH0, OP_FPUSH1, OP_FPUSH2, OP_FPUSH3, OP_FPUSH4, OP_FPUSH5, OP_FPUSH6, OP_FPUSH7,
+    // helper opcodes, these get ignored when recompiling
+    _SPACER, // spacer that goes above new function
+    _SUB     // start of subroutine
 };
 
 class IOpcode
@@ -57,7 +60,7 @@ public:
     virtual QString  getName() = 0;
     virtual EOpcodes getOp()   = 0;
 
-    virtual QByteArray   getData()     { return m_data;     }
+    virtual QByteArray   &getData()     { return m_data;     }
     virtual unsigned int getLocation() { return m_location; }
     virtual int          getSize()     { return m_size;     }
 
@@ -70,11 +73,21 @@ public:
 
     virtual QByteArray getFullData();
 
+    // Editing related
+
+    virtual bool getDeleted()             { return m_delete;    }
+    virtual void setDeleted(bool deleted) { m_delete = deleted; } // mark for deletion when recompiled
+
+    virtual void setData(QByteArray data) { m_data = data;      }
+
+    virtual void setLocation(int loc)     { m_location = loc;   }
+
 protected:
     QByteArray m_data;
     unsigned int m_location;
     QVector<IOpcode*> m_references;
     int m_size;
     int m_page;
+    bool m_delete;
 };
 #endif // IOPCODE_H

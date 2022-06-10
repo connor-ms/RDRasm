@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>838</width>
-    <height>618</height>
+    <width>844</width>
+    <height>624</height>
    </rect>
   </property>
   <property name="font">
@@ -139,7 +139,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>838</width>
+     <width>844</width>
      <height>19</height>
     </rect>
    </property>
@@ -147,16 +147,8 @@
     <property name="title">
      <string>File</string>
     </property>
-    <widget class="QMenu" name="menuExport">
-     <property name="title">
-      <string>Export</string>
-     </property>
-     <addaction name="actionExportDisassembly"/>
-     <addaction name="actionExportRawData"/>
-    </widget>
     <addaction name="actionOpen"/>
     <addaction name="actionOpenRecent"/>
-    <addaction name="menuExport"/>
     <addaction name="separator"/>
     <addaction name="actionExit"/>
    </widget>
@@ -180,7 +172,23 @@
      <addaction name="actionConvertPS3"/>
      <addaction name="actionConvertX360"/>
     </widget>
+    <widget class="QMenu" name="menuCompile">
+     <property name="title">
+      <string>Compile</string>
+     </property>
+     <addaction name="actionCompilePS3"/>
+     <addaction name="actionCompileX360"/>
+    </widget>
+    <widget class="QMenu" name="menuExport_2">
+     <property name="title">
+      <string>Export</string>
+     </property>
+     <addaction name="actionExportDisassembly_2"/>
+     <addaction name="actionExportRawData_2"/>
+    </widget>
     <addaction name="menuConvertScript"/>
+    <addaction name="menuCompile"/>
+    <addaction name="menuExport_2"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuTools"/>
@@ -219,6 +227,36 @@
   <action name="actionConvertX360">
    <property name="text">
     <string>Xbox 360</string>
+   </property>
+  </action>
+  <action name="actionPS3">
+   <property name="text">
+    <string>PS3</string>
+   </property>
+  </action>
+  <action name="actionXbox_360">
+   <property name="text">
+    <string>Xbox 360</string>
+   </property>
+  </action>
+  <action name="actionCompilePS3">
+   <property name="text">
+    <string>PS3</string>
+   </property>
+  </action>
+  <action name="actionCompileX360">
+   <property name="text">
+    <string>Xbox 360</string>
+   </property>
+  </action>
+  <action name="actionExportDisassembly_2">
+   <property name="text">
+    <string>Disassembly</string>
+   </property>
+  </action>
+  <action name="actionExportRawData_2">
+   <property name="text">
+    <string>Raw Data</string>
    </property>
   </action>
  </widget>

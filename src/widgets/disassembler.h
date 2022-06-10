@@ -28,8 +28,8 @@ public slots:
     void exit();
     void open();
 
-    void convertPS3();
-    void convertX360();
+    void compilePS3();
+    void compileX360();
 
 private:
     void fillDisassembly();
@@ -41,6 +41,8 @@ private:
 
     QString getResourceHeaderData();
     QString getScriptHeaderData();
+
+    void compile(ScriptType type);
 
     QMap<unsigned int, QString> m_nativeMap;
 

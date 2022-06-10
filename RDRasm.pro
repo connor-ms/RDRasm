@@ -10,8 +10,11 @@ CONFIG += c++17
 
 SOURCES += \
     src/main.cpp \
+    src/rage/compiler.cpp \
     src/rage/iopcode.cpp \
     src/rage/opcodefactory.cpp \
+    src/rage/opcodes/enter.cpp \
+    src/rage/opcodes/helper.cpp \
     src/rage/opcodes/include.cpp \
     src/rage/opcodes/methods.cpp \
     src/rage/opcodes/misc.cpp \
@@ -22,13 +25,17 @@ SOURCES += \
     src/util/util.cpp \
     src/util/crypto/xcompress.cpp \
     src/widgets/disassembler.cpp \
+    src/widgets/editdialog.cpp \
     src/widgets/launchscreen.cpp \
     src/widgets/opcodetable.cpp
 
 HEADERS += \
+    src/rage/compiler.h \
     src/rage/iopcode.h \
     src/rage/opcodefactory.h \
+    src/rage/opcodes/enter.h \
     src/rage/opcodes/float.h \
+    src/rage/opcodes/helper.h \
     src/rage/opcodes/integer.h \
     src/rage/opcodes/methods.h \
     src/rage/opcodes/misc.h \
@@ -43,11 +50,13 @@ HEADERS += \
     src/util/crypto/zconf.h \
     src/util/crypto/zlib.h \
     src/widgets/disassembler.h \
+    src/widgets/editdialog.h \
     src/widgets/launchscreen.h \
     src/widgets/opcodetable.h
 
 FORMS += \
     src/widgets/disassembler.ui \
+    src/widgets/editdialog.ui \
     src/widgets/launchscreen.ui
 
 include(lib/QHexView/QHexView.pri)

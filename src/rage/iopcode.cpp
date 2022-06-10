@@ -2,6 +2,7 @@
 
 void IOpcode::read(QDataStream *stream)
 {
+    m_delete   = false;
     m_location = stream->device()->pos() - 1;
 
     byte b;

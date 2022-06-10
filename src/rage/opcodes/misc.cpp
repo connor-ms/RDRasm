@@ -1,12 +1,13 @@
 #include "misc.h"
 
+#include <QDebug>
+
 void Op_SwitchR2::read(QDataStream *stream)
 {
+    m_delete   = false;
     m_location = stream->device()->pos() - 1;
 
-    byte b1;
-    int temp;
-    short temp2;
+    byte b1, b2;
 
     int size = 0;
 
@@ -15,16 +16,13 @@ void Op_SwitchR2::read(QDataStream *stream)
 
     m_data.push_back(b1);
 
-    for (int i = 0; i < b1; i++)
+    // TODO: correctly implement switches
+
+    for (int i = 0; i < b1 * 6; i++)
     {
-        *stream >> temp;
-        *stream >> temp2;
-
-        m_data.push_back(temp);
-        m_data.push_back(temp2);
-
-        size += sizeof(int);
-        size += sizeof(short);
+        *stream >> b2;
+        m_data.push_back(b2);
+        size += 1;
     }
 
     m_size = size;

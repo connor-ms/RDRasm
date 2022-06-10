@@ -2,6 +2,7 @@
 
 void Op_SPush::read(QDataStream *stream)
 {
+    m_delete   = false;
     m_location = stream->device()->pos() - 1;
 
     byte b;
@@ -32,13 +33,16 @@ QString Op_SPush::getFormattedData()
     // only return string
     QString result(getData());
 
+    result.remove(0, 1);
+
     result.replace(0x0A, "\\n");
 
-    return "\"" + QString(result.remove(0, 1)) + "\"";
+    return "\"" + result + "\"";
 }
 
 void Op_SPushL::read(QDataStream *stream)
 {
+    m_delete   = false;
     // todo
 }
 

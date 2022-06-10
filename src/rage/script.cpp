@@ -1,10 +1,13 @@
 #include "script.h"
 
+#include <QFileDialog>
 #include <QMessageBox>
 #include <QSysInfo>
 
 #include "../rage/opcodefactory.h"
 #include "../util/util.h"
+
+#include "../rage/opcodes/enter.h"
 
 #define ReadVar(x) stream >> x;
 #define ReadPointer(x) stream >> x; x = x & 0xffffff;
@@ -49,7 +52,11 @@ Script::Script(QString path)
 
     readScriptHeader(m_scriptHeader.headerPos);
     readNatives();
+    readStatics();
     readPages();
+    insertJumps();
+
+    //clean();
 }
 
 bool Script::readRSCHeader()
@@ -79,8 +86,6 @@ bool Script::readRSCHeader()
 
 void Script::extractData()
 {
-    m_footer = m_data.mid(m_data.size() - (m_data.size() % 16));
-
     if (m_header.version == 2)
     {
         // remove rsc header
@@ -139,6 +144,9 @@ void Script::readScriptHeader(int headerPos)
     ReadVar(m_scriptHeader.magic);
     ReadPointer(m_scriptHeader.pageMapPtr);
     ReadPointer(m_scriptHeader.codePagesPtr);
+
+    m_scriptHeader.codeSizePos = stream.device()->pos();
+
     ReadVar(m_scriptHeader.codeSize);
     ReadVar(m_scriptHeader.paramCount);
     ReadVar(m_scriptHeader.staticsSize);
@@ -163,6 +171,21 @@ void Script::readNatives()
     {
         ReadVar(nativeHash);
         m_natives.push_back(nativeHash);
+    }
+}
+
+void Script::readStatics()
+{
+    QDataStream stream(m_data);
+
+    stream.device()->seek(m_scriptHeader.staticsPtr);
+
+    int value;
+
+    for (int i = 0; i < m_scriptHeader.staticsSize; i++)
+    {
+        ReadVar(value);
+        m_statics.push_back(value);
     }
 }
 
@@ -224,7 +247,11 @@ void Script::readPage(int address, int page)
 
         if (op->getOp() == EOpcodes::OP_ENTER)
         {
+            m_opcodes.push_back(OpcodeFactory::Create((EOpcodes)EOpcodes::_SPACER));
+
             QString funcName;
+
+            std::shared_ptr<Op_Enter> enter = std::dynamic_pointer_cast<Op_Enter>(op);
 
             if (op->getFormattedData().isEmpty() && m_funcCount > 0)
             {
@@ -239,11 +266,11 @@ void Script::readPage(int address, int page)
                 funcName = op->getFormattedData();
             }
 
-            if (m_funcNames.count(op->getLocation()) == 0)
-            {
-                int offset = op->getLocation();
-                m_funcNames.insert(std::pair<unsigned int, QString>(offset, funcName));
-            }
+            m_funcs.insert(std::pair<unsigned int, std::shared_ptr<Op_Enter>>(op->getLocation(), enter));
+
+            enter->setFuncName(funcName);
+
+            op = enter;
 
             m_funcCount++;
         }
@@ -254,8 +281,25 @@ void Script::readPage(int address, int page)
         else if (op->getOp() >= EOpcodes::OP_JMP && op->getOp() <= EOpcodes::OP_JMPGT)
         {
             int jumpPos = op->getData()[1] + op->getLocation() + 3;
+            std::shared_ptr<Op_HSub> jump;
 
-            m_jumps.insert(std::pair<int, QString>(jumpPos, "sub_" + QString::number(jumpCount).rightJustified(5, '0')));
+            if (m_jumps.count(jumpPos) == 0)
+            {
+                jump = std::dynamic_pointer_cast<Op_HSub>(OpcodeFactory::Create(EOpcodes::_SUB));
+
+                jump->setSub(jumpCount);
+                jump->setLocation(jumpPos);
+                jump->addReference(op);
+
+                m_jumps.insert(std::pair<int, std::shared_ptr<Op_HSub>>(jumpPos, jump));
+            }
+            else
+            {
+                jump = m_jumps.at(jumpPos);
+
+                jump->addReference(op);
+            }
+
             jumpCount++;
         }
 
@@ -263,31 +307,24 @@ void Script::readPage(int address, int page)
     }
 }
 
-void Script::rebuild()
+void Script::insertJumps()
 {
-    for (unsigned int page = 0; page < getPageOffsets().size(); page++)
+    auto temp(m_jumps); // save jumps
+
+    for (int i = 0; i < m_opcodes.size(); i++)
     {
-        unsigned int pos = getPageLocations()[page];
-        unsigned int length = (page == (unsigned int)m_scriptHeader.codePagesSize - 1) ? m_scriptHeader.codeSize % 0x4000 : 0x4000;
+        auto op = m_opcodes[i];
 
-        // clear current page
-        memset(m_data.data() + pos, 0, length);
-
-        std::list<std::shared_ptr<IOpcode>>::iterator itr = m_opcodes.begin();
-
-        while (pos < getPageLocations()[page] + length)
+        if (m_jumps.count(op->getLocation()) != 0)
         {
-            if (itr == m_opcodes.end())
-                break;
+            auto jump = m_jumps.at(op->getLocation());
 
-            std::shared_ptr<IOpcode> op = *itr;
+            m_opcodes.insert(i, jump);
 
-            int size = op->getData().size() + 1;
-
-            memcpy(m_data.data() + pos, op->getFullData().data(), size);
-
-            pos += size;
-            std::advance(itr, 1);
+            // clear jump at current location, otherwise program gets stuck in an infinite loop
+            m_jumps.erase(op->getLocation());
         }
     }
+
+    m_jumps = temp; // restore jumps
 }

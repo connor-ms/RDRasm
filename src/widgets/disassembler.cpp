@@ -5,6 +5,9 @@
 #include <QMessageBox>
 #include <QTextStream>
 
+#include "../rage/compiler.h"
+#include "../rage/opcodes/enter.h"
+#include "../rage/opcodes/helper.h"
 #include "../util/util.h"
 #include "../QHexView/qhexview.h"
 #include "../QHexView/document/buffer/qmemoryrefbuffer.h"
@@ -29,14 +32,19 @@ Disassembler::Disassembler(QString file, QWidget *parent)
     createNativeTab();
     createScriptDataTab();
 
-    connect(m_ui->actionExportDisassembly, SIGNAL(triggered()), this, SLOT(exportDisassembly()));
-    connect(m_ui->actionExportRawData,     SIGNAL(triggered()), this, SLOT(exportRawData()));
+    m_disasm->setOpcodes(m_script.getOpcodes());
+
+    connect(m_ui->actionExportDisassembly_2, SIGNAL(triggered()), this, SLOT(exportDisassembly()));
+    connect(m_ui->actionExportRawData_2,     SIGNAL(triggered()), this, SLOT(exportRawData()));
 
     connect(m_ui->actionExit, SIGNAL(triggered()), this, SLOT(exit()));
     connect(m_ui->actionOpen, SIGNAL(triggered()), this, SLOT(open()));
 
-    connect(m_ui->actionConvertPS3,  SIGNAL(triggered()), this, SLOT(convertPS3()));
-    connect(m_ui->actionConvertX360, SIGNAL(triggered()), this, SLOT(convertX360()));
+    connect(m_ui->actionConvertPS3,  SIGNAL(triggered()), this, SLOT(compilePS3()));
+    connect(m_ui->actionConvertX360, SIGNAL(triggered()), this, SLOT(compileX360()));
+
+    connect(m_ui->actionCompilePS3,  &QAction::triggered, this, [this]{ compile(ScriptType::TYPE_PS3);  });
+    connect(m_ui->actionCompileX360, &QAction::triggered, this, [this]{ compile(ScriptType::TYPE_X360); });
 
     setWindowTitle("RDRasm - " + file);
 
@@ -135,14 +143,16 @@ void Disassembler::open()
     }
 }
 
-void Disassembler::convertPS3()
-{
+void Disassembler::compilePS3()
+{    
+    Compiler compiler(m_script);
+
     QString outDir = QFileDialog::getSaveFileName(this, "Convert to .csc", QString(), "Script (*.csc)");
 
     if (outDir.isEmpty())
         return;
 
-    QByteArray script = Util::encrypt(Util::zlibCompress(m_script.getData()));
+    QByteArray script = Util::encrypt(Util::lzxCompress(compiler.compile()));
 
     QByteArray header;
     QDataStream stream(&header, QIODevice::WriteOnly);
@@ -165,17 +175,19 @@ void Disassembler::convertPS3()
     out.write(script);
     out.close();
 
-    QMessageBox::information(this, "Converted script", QString("Succesfully converted script to %1.").arg(outDir));
+    QMessageBox::information(this, "Compiled script", QString("Succesfully compiled script to %1.").arg(outDir));
 }
 
-void Disassembler::convertX360()
-{
+void Disassembler::compileX360()
+{    
+    Compiler compiler(m_script);
+
     QString outDir = QFileDialog::getSaveFileName(this, "Convert to .xsc", QString(), "Script (*.xsc)");
 
     if (outDir.isEmpty())
         return;
 
-    QByteArray script = Util::encrypt(Util::lzxCompress(m_script.getData()));
+    QByteArray script = Util::encrypt(Util::lzxCompress(compiler.compile()));
 
     QByteArray header;
     QDataStream stream(&header, QIODevice::WriteOnly);
@@ -198,7 +210,19 @@ void Disassembler::convertX360()
     out.write(script);
     out.close();
 
-    QMessageBox::information(this, "Converted script", QString("Succesfully converted script to %1.").arg(outDir));
+    QMessageBox::information(this, "Compiled script", QString("Succesfully compiled script to %1.").arg(outDir));
+}
+
+void Disassembler::compile(ScriptType type)
+{
+    if (type == ScriptType::TYPE_PS3)
+    {
+        compilePS3();
+    }
+    else
+    {
+        compileX360();
+    }
 }
 
 void Disassembler::createScriptDataTab()
@@ -295,14 +319,32 @@ QTableWidget *Disassembler::createStringsTab()
     return stringTable;
 }
 
+#include <QDebug>
+
 void Disassembler::fillDisassembly()
 {
     int invalidCalls = 0;
+    bool firstFunc = true;
 
     for (auto op : m_script.getOpcodes())
     {
-        if (op->getOp() == EOpcodes::OP_NOP)
+        //if (op->getOp() == EOpcodes::OP_NOP)
+        //    continue;
+
+        int index = m_disasm->rowCount();
+
+        if (op->getOp() == EOpcodes::_SPACER)
+        {
+            // don't put spacer in front of first function
+            if (firstFunc)
+            {
+                firstFunc = false;
+                continue;
+            }
+
+            m_disasm->insertRow(index);
             continue;
+        }
 
         QTableWidgetItem *address = new QTableWidgetItem(op->getFormattedLocation());
         QTableWidgetItem *bytes   = new QTableWidgetItem(op->getFormattedBytes());
@@ -315,17 +357,7 @@ void Disassembler::fillDisassembly()
         opcode->setForeground(QColor(48,  98, 174));
         bytes->setForeground(QColor(120, 120, 120));
 
-        int index = m_disasm->rowCount();
         m_disasm->setRowCount(index + 1);
-
-        if (m_script.getJumps().count(op->getLocation()) == 1)
-        {
-            QTableWidgetItem *jump = new QTableWidgetItem(QString(":" + m_script.getJumps().at(op->getLocation())));
-            jump->setForeground(QColor(255, 0, 0));
-
-            m_disasm->setItem(index++, 1, jump);
-            m_disasm->insertRow(index);
-        }
 
         if (op->getOp() == EOpcodes::OP_NATIVE)
         {
@@ -341,12 +373,9 @@ void Disassembler::fillDisassembly()
         }
         else if (op->getOp() == EOpcodes::OP_ENTER)
         {
-            if (m_script.getFuncNames().at(op->getLocation()) != "__entrypoint")
-            {
-                m_disasm->insertRow(index++);
-            }
+            std::shared_ptr<Op_Enter> enter = std::dynamic_pointer_cast<Op_Enter>(op);
 
-            data->setText(m_script.getFuncNames().at(op->getLocation()));
+            data->setText(enter->getFuncName());
 
             address->setFont(funcFont);
             bytes->setFont(funcFont);
@@ -364,7 +393,7 @@ void Disassembler::fillDisassembly()
             m_ui->funcTable->setRowCount(index + 1);
 
             m_ui->funcTable->setItem(index, 0, new QTableWidgetItem(op->getFormattedLocation()));
-            m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(m_script.getFuncNames().at(op->getLocation())));
+            m_ui->funcTable->setItem(index, 1, new QTableWidgetItem(m_script.getFuncs().at(op->getLocation())->getFuncName()));
         }
         else if (op->getOp() >= EOpcodes::OP_CALL2 && op->getOp() <= EOpcodes::OP_CALL2HF)
         {
@@ -377,14 +406,16 @@ void Disassembler::fillDisassembly()
 
             callOffset += m_script.getPageOffsets()[m_script.getPageByLocation(callOffset)];
 
-            if (m_script.getFuncNames().count(callOffset) == 0)
+            if (m_script.getFuncs().count(callOffset) == 0)
             {
                 data->setText(QString("??? (%1)").arg(callOffset, 5, 16));
                 invalidCalls++;
             }
             else
             {
-                data->setText(m_script.getFuncNames().at(callOffset));
+                data->setText(m_script.getFuncs().at(callOffset)->getFuncName());
+
+                m_script.getFuncs().at(callOffset)->addReference(op);
             }
 
             data->setFont(funcFont);
@@ -393,8 +424,20 @@ void Disassembler::fillDisassembly()
         else if (op->getOp() >= EOpcodes::OP_JMP && op->getOp() <= EOpcodes::OP_JMPGT)
         {
             int jumpPos = op->getData()[1] + op->getLocation() + 3;
-            data->setText("@" + m_script.getJumps().at(jumpPos));
+            //data->setText("@" + m_script.getJumps().at(jumpPos)->getSub());
+            data->setText("@" + m_script.getJumps().at(jumpPos)->getSub());
             data->setForeground(QColor(255, 0, 0));
+        }
+        else if (op->getOp() == EOpcodes::_SUB)
+        {
+            m_disasm->setRowCount(index + 1);
+
+            QTableWidgetItem *jump = new QTableWidgetItem(QString(":" + std::dynamic_pointer_cast<Op_HSub>(op)->getSub()));
+            jump->setForeground(QColor(255, 0, 0));
+
+            m_disasm->setItem(index, 1, jump);
+
+            continue;
         }
 
         m_disasm->setItem(index, 0, address);

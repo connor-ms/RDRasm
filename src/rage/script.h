@@ -6,6 +6,8 @@
 #include <QString>
 
 #include "opcodefactory.h"
+#include "../rage/opcodes/helper.h"
+#include "../rage/opcodes/enter.h"
 
 struct ResourceHeader
 {
@@ -34,6 +36,7 @@ struct ScriptHeader
     int staticsPtr;
 
     int globalsVers;
+
     int nativesSize;
     int nativesPtr;
 
@@ -42,6 +45,7 @@ struct ScriptHeader
     std::vector<int> codePages;
 
     int headerPos;
+    int codeSizePos;
 };
 
 enum ScriptType
@@ -62,20 +66,21 @@ public:
     ResourceHeader getResourceHeader() { return m_header;       }
     ScriptHeader   getScriptHeader()   { return m_scriptHeader; }
 
-    std::list<std::shared_ptr<IOpcode>>   getOpcodes() { return m_opcodes; }
+    QVector<std::shared_ptr<IOpcode>>     getOpcodes() { return m_opcodes; }
     std::vector<std::shared_ptr<IOpcode>> getStrings() { return m_strings; }
-    std::map<unsigned int, QString>       getJumps()   { return m_jumps;   }
-    QVector<unsigned int>                 getNatives() { return m_natives; }
 
-    std::map<int, QString> getFuncNames() { return m_funcNames; }
-    unsigned int getFuncCount()           { return m_funcCount; }
+    QVector<unsigned int> getNatives() { return m_natives; }
+    QVector<int> getStatics() { return m_statics; }
+
+    std::map<unsigned int, std::shared_ptr<Op_HSub>>  getJumps() { return m_jumps; }
+    std::map<unsigned int, std::shared_ptr<Op_Enter>> getFuncs() { return m_funcs; }
+
+    unsigned int getFuncCount() { return m_funcCount; }
 
     std::vector<unsigned int> getPageOffsets()   { return m_pageOffsets;   }
     std::vector<unsigned int> getPageLocations() { return m_pageLocations; }
 
     unsigned int getPageByLocation(unsigned int location);
-
-    void rebuild();
 
 private:
     // Extract script from RSC container
@@ -91,24 +96,28 @@ private:
     void readPages();
     void readPage(int address, int page);
 
+    void insertJumps();
+
     // Resource data
     ResourceHeader m_header;
-    QByteArray     m_footer;
 
     // Script data
     ScriptHeader m_scriptHeader;
     QVector<unsigned int> m_natives;
+    QVector<int> m_statics;
 
     std::vector<unsigned int> m_pageOffsets;
     std::vector<unsigned int> m_pageLocations;
 
-    std::list<std::shared_ptr<IOpcode>> m_opcodes;
+    QVector<std::shared_ptr<IOpcode>> m_opcodes;
 
     unsigned int m_funcCount;
     std::map<int, QString> m_funcNames;
 
     std::vector<std::shared_ptr<IOpcode>> m_strings;
-    std::map<unsigned int, QString> m_jumps;
+
+    std::map<unsigned int, std::shared_ptr<Op_HSub>>  m_jumps;
+    std::map<unsigned int, std::shared_ptr<Op_Enter>> m_funcs;
 
     // General data
     QByteArray m_data;
