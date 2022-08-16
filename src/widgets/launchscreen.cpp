@@ -21,6 +21,8 @@ LaunchScreen::LaunchScreen(QWidget *parent) :
         m_ui->btnOpenFile->setEnabled(false);
     }
 
+    QDir().mkdir("debug");
+
     connect(m_ui->btnOpenFile, SIGNAL(clicked()), this, SLOT(openFilePressed()));
     connect(m_ui->btnGithub,   SIGNAL(clicked()), this, SLOT(githubPressed()));
     connect(m_ui->btnExit,     SIGNAL(clicked()), this, SLOT(exitPressed()));
@@ -39,7 +41,7 @@ void LaunchScreen::openFilePressed()
     {
         QApplication::setOverrideCursor(Qt::WaitCursor);
 
-        Disassembler *dsm = new Disassembler(file);
+        Disassembler *dsm = new Disassembler(file, m_ui->cbDebug->isChecked());
         dsm->show();
 
         close();

@@ -57,7 +57,7 @@ enum ScriptType
 class Script
 {
 public:
-    Script(QString path);
+    Script(QString path, bool debug = false);
 
     ScriptType getScriptType() { return m_scriptType; }
 
@@ -123,6 +123,7 @@ private:
     QByteArray m_data;
     QFile m_script;
     ScriptType m_scriptType;
+    bool m_debug;
 };
 
 #endif // SCRIPT_H

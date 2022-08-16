@@ -19,7 +19,7 @@ class Disassembler : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit Disassembler(QString file, QWidget *parent = nullptr);
+    explicit Disassembler(QString file, bool debug, QWidget *parent = nullptr);
     ~Disassembler();
 
 public slots:
@@ -50,6 +50,7 @@ private:
     Script m_script;
     QString m_file;
     OpcodeTable *m_disasm;
+    bool m_debug;
 };
 
 #endif // DISASSEMBLER_H

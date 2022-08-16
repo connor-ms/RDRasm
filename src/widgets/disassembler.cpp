@@ -12,11 +12,12 @@
 #include "../QHexView/qhexview.h"
 #include "../QHexView/document/buffer/qmemoryrefbuffer.h"
 
-Disassembler::Disassembler(QString file, QWidget *parent)
+Disassembler::Disassembler(QString file, bool debug, QWidget *parent)
     : QMainWindow(parent)
     , m_ui(new Ui::Disassembler)
-    , m_script(file)
+    , m_script(file, debug)
     , m_file(file)
+    , m_debug(debug)
 {
     m_ui->setupUi(this);
 
@@ -136,7 +137,7 @@ void Disassembler::open()
     {
         QApplication::setOverrideCursor(Qt::WaitCursor);
 
-        Disassembler *dsm = new Disassembler(file);
+        Disassembler *dsm = new Disassembler(file, m_debug);
         dsm->show();
 
         close();
@@ -319,8 +320,6 @@ QTableWidget *Disassembler::createStringsTab()
     return stringTable;
 }
 
-#include <QDebug>
-
 void Disassembler::fillDisassembly()
 {
     int invalidCalls = 0;
@@ -328,9 +327,6 @@ void Disassembler::fillDisassembly()
 
     for (auto op : m_script.getOpcodes())
     {
-        //if (op->getOp() == EOpcodes::OP_NOP)
-        //    continue;
-
         int index = m_disasm->rowCount();
 
         if (op->getOp() == EOpcodes::_SPACER)
@@ -424,7 +420,7 @@ void Disassembler::fillDisassembly()
         else if (op->getOp() >= EOpcodes::OP_JMP && op->getOp() <= EOpcodes::OP_JMPGT)
         {
             int jumpPos = op->getData()[1] + op->getLocation() + 3;
-            //data->setText("@" + m_script.getJumps().at(jumpPos)->getSub());
+
             data->setText("@" + m_script.getJumps().at(jumpPos)->getSub());
             data->setForeground(QColor(255, 0, 0));
         }

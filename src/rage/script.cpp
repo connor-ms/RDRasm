@@ -12,9 +12,10 @@
 #define ReadVar(x) stream >> x;
 #define ReadPointer(x) stream >> x; x = x & 0xffffff;
 
-Script::Script(QString path)
+Script::Script(QString path, bool debug)
     : m_funcCount(0)
     , m_script(path)
+    , m_debug(debug)
 {
     if (!m_script.open(QIODevice::ReadOnly))
     {
@@ -94,6 +95,15 @@ void Script::extractData()
         m_data = Util::decrypt(m_data);
 
         int outSize = m_header.getSizeP() + m_header.getSizeV();
+
+        if (m_debug)
+        {
+            QFileInfo info(m_script);
+            QFile out("debug/" + info.fileName() + ".dbg");
+
+            out.open(QIODevice::WriteOnly | QIODevice::Truncate);
+            out.write(m_data);
+        }
 
         if (m_scriptType == ScriptType::TYPE_X360)
         {

@@ -43,7 +43,7 @@
    <property name="font">
     <font>
      <family>Consolas</family>
-     <pointsize>19</pointsize>
+     <pointsize>18</pointsize>
     </font>
    </property>
    <property name="text">
@@ -90,6 +90,25 @@
    </property>
    <property name="text">
     <string>Exit</string>
+   </property>
+  </widget>
+  <widget class="QCheckBox" name="cbDebug">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>310</y>
+     <width>91</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Consolas</family>
+     <pointsize>8</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Debug mode</string>
    </property>
   </widget>
  </widget>
