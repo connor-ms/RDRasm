@@ -13,6 +13,7 @@ For the latest download, navigate to the releases tab, or click [here](https://g
 - Export disassembly
 - Convert script to .csc
 - Convert script to .xsc
+- Edit strings & properly recompile
 
 # Usage
 I've provided a simple example script that is intended to be used to see how the program works, without needing to extract a script from the game. I've provided the source code of that script as well, to be able to compare the disassembly with the source code of the script.
