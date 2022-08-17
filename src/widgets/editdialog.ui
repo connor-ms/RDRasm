@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>468</width>
-    <height>89</height>
+    <width>470</width>
+    <height>91</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,23 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLabel" name="lblOpName">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>30</y>
-     <width>91</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>opname</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="editBox">
+  <widget class="QLineEdit" name="data">
    <property name="geometry">
     <rect>
      <x>100</x>
@@ -53,6 +37,19 @@
      <width>231</width>
      <height>21</height>
     </rect>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="opcode">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>30</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="editable">
+    <bool>true</bool>
    </property>
   </widget>
  </widget>
